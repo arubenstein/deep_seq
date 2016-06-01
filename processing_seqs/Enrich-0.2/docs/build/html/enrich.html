@@ -1,0 +1,674 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Enrich 0.2 documentation &mdash; Enrich v0.2 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Enrich v0.2 documentation" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="index.html">Enrich v0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="enrich-version-documentation">
+<h1>Enrich 0.2 documentation<a class="headerlink" href="#enrich-version-documentation" title="Permalink to this headline">¶</a></h1>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Authors:</th><td class="field-body">Douglas M. Fowler, Carlos L. Araya, Wayne Gerards</td>
+</tr>
+<tr class="field"><th class="field-name">Homepage:</th><td class="field-body"><a class="reference external" href="http://depts.washington.edu/sfields/software/enrich/">http://depts.washington.edu/sfields/software/enrich/</a></td>
+</tr>
+<tr class="field"><th class="field-name">Organization:</th><td class="field-body">University of Washington</td>
+</tr>
+<tr class="field"><th class="field-name">Address:</th><td class="field-body">Department of Genome Sciences, Box 355065, Seattle, WA, 98195</td>
+</tr>
+<tr class="field"><th class="field-name">Copyright:</th><td class="field-body">Douglas M. Fowler and Carlos L. Araya, 2010-2011</td>
+</tr>
+<tr class="field"><th class="field-name">License:</th><td class="field-body">FreeBSD</td>
+</tr>
+<tr class="field"><th class="field-name">Last update:</th><td class="field-body">September 15, 2011</td>
+</tr>
+<tr class="field"><th class="field-name">Contact:</th><td class="field-body">Douglas M. Fowler (dfowler at uw dot edu)</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="overview">
+<h1>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h1>
+<p>Enrich is an analysis pipeline for using high throughput sequencing data to assess protein sequence-function relationships. Enrich takes FASTQ files as input, translating and identifying unique protein sequences and calculating enrichment ratios between libraries for each sequence. Enrich can be run from the command line or in an interactive mode, and is capable of using paired-end read data.  Each step of the pipeline can be run separately or the entire sequence of steps can be run consecutively. Enrich is designed to be run on a single desktop computer on an average data set in ~2 hours.  Enrich can run in an Oracle Grid Engine (OGE) environment so that many analyses can be carried out in parallel. Enrich employs the DRMAA API to interface with OGE. DRMAA enables extension to other high-performance computing environments with minimal effort. For a description of Enrich input, function and output please see the following publications:</p>
+<p>High-resolution mapping of protein sequence-function relationships.
+Fowler DM, Araya CL, Fleishman SJ, Kellogg EH, Stephany JJ, Baker D, Fields S.
+Nat Methods. 2010 Sep;7(9):741-6. Epub 2010 Aug 15.</p>
+<p>and</p>
+<p>Enrich: Software for Analysis of Protein Function by Enrichment and Depletion of Variants.
+Fowler DM, Araya CL, Gerards W, Fields S.
+Submitted (email D. Fowler for a copy)</p>
+</div>
+<div class="section" id="installation">
+<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<p>Enrich retains core functionality when run without any <a class="reference internal" href="#dependencies"><em>dependencies</em></a> in a pure Python environment. Thus, Enrich can be run by executing the <tt class="docutils literal"><span class="pre">enrich.py</span></tt> script located in the Enrich tarball without any taking any other steps.</p>
+<p>For convenience, Enrich is can be installed using <a class="reference external" href="http://peak.telecommunity.com/DevCenter/EasyInstall">easy_install</a> which is part of <a class="reference external" href="http://peak.telecommunity.com/DevCenter/setuptools">setuptools</a>. Please obtain the current version of Enrich <a class="reference external" href="http://depts.washington.edu/sfields/software/enrich/">here</a>. After downloading Enrich, install it by typing:</p>
+<div class="highlight-python"><pre>easy_install Enrich-|version|.tar.gz</pre>
+</div>
+<p>If you do not have setuptools, running the <tt class="docutils literal"><span class="pre">ez_setup.py</span></tt> script in the source tarball will automatically download and install setuptools followed by Enrich.</p>
+<div class="section" id="installation-on-a-cluster">
+<h2>Installation on a cluster<a class="headerlink" href="#installation-on-a-cluster" title="Permalink to this headline">¶</a></h2>
+<p>If you are using a cluster and do not have root access, <tt class="docutils literal"><span class="pre">easy_install</span></tt> may fail because it does not have write access to the default installation directories.  You can overcome this limitation by using the <tt class="docutils literal"><span class="pre">-d</span></tt> easy_install option, which allows you to specify an installation directory to which you do have access.  The install directory will need to be in your <em>$PYTHONPATH</em>, and you will also need to add it to your <em>$PATH</em> if you wish to use the <tt class="docutils literal"><span class="pre">enrich</span></tt> executable, which will be installed in the specified directory.</p>
+</div>
+<div class="section" id="dependencies">
+<span id="id1"></span><h2>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this headline">¶</a></h2>
+<p>Enrich will identify and enumerate variants as well as calculate enrichment ratios without any dependencies. However, Enrich depends upon several common Python packages to perform optional tasks. Many of these dependencies are available as precompiled binaries, and it is recommended that these precompiled binaries be used whenever possible.  Below, each the purpose of each dependency is explained along with recommended versions and brief guidance for installation. Installing the dependencies in the order listed is recommended.</p>
+<div class="section" id="drmaa">
+<h3>DRMAA<a class="headerlink" href="#drmaa" title="Permalink to this headline">¶</a></h3>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name" colspan="2">What it&#8217;s used for:</th></tr>
+<tr><td>&nbsp;</td><td class="field-body">DRMAA is required to interface with OGE</td>
+</tr>
+<tr class="field"><th class="field-name" colspan="2">What versions have been tested:</th></tr>
+<tr><td>&nbsp;</td><td class="field-body">DRMAA-0.4b3</td>
+</tr>
+<tr class="field"><th class="field-name" colspan="2">How is it installed?:</th></tr>
+<tr><td>&nbsp;</td><td class="field-body">DRMAA can be installed using easy_install by typing <tt class="docutils literal"><span class="pre">easy_install</span> <span class="pre">drmaa==0.4b3</span></tt></td>
+</tr>
+</tbody>
+</table>
+<p>More information is available <a class="reference external" href="http://code.google.com/p/drmaa-python/">here</a></p>
+</div>
+<div class="section" id="numpy-and-scipy">
+<h3>Numpy and Scipy<a class="headerlink" href="#numpy-and-scipy" title="Permalink to this headline">¶</a></h3>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name" colspan="2">What it&#8217;s used for:</th></tr>
+<tr><td>&nbsp;</td><td class="field-body">Numpy and Scipy are used for generating visualizations and for calculating q-values for enrichment and depletion</td>
+</tr>
+<tr class="field"><th class="field-name" colspan="2">What versions have been tested:</th></tr>
+<tr><td>&nbsp;</td><td class="field-body">numpy-1.4.1, scipy-0.8.0 and 0.9.0</td>
+</tr>
+<tr class="field"><th class="field-name" colspan="2">How is it installed?:</th></tr>
+<tr><td>&nbsp;</td><td class="field-body">Precompiled binaries are available for Numpy and Scipy for OS X, Windows and some flavors of Unix. These, as well as source code and instructions for installation are available <a class="reference external" href="http://new.scipy.org/download.html">here</a>.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="biopython">
+<h3>Biopython<a class="headerlink" href="#biopython" title="Permalink to this headline">¶</a></h3>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name" colspan="2">What it&#8217;s used for:</th></tr>
+<tr><td>&nbsp;</td><td class="field-body">Biopython is used for performing the optional Needleman-Wunsch alignment of read pairs</td>
+</tr>
+<tr class="field"><th class="field-name" colspan="2">What versions have been tested:</th></tr>
+<tr><td>&nbsp;</td><td class="field-body">biopython-1.5.2 and 1.5.5</td>
+</tr>
+<tr class="field"><th class="field-name" colspan="2">How is it installed?:</th></tr>
+<tr><td>&nbsp;</td><td class="field-body">Biopython can be installed using easy_install by typing <tt class="docutils literal"><span class="pre">easy_install</span> <span class="pre">biopython==1.55b</span></tt></td>
+</tr>
+</tbody>
+</table>
+<p>More information is available <a class="reference external" href="http://biopython.org/DIST/docs/install/Installation.html">here</a></p>
+</div>
+<div class="section" id="matplotlib">
+<h3>Matplotlib<a class="headerlink" href="#matplotlib" title="Permalink to this headline">¶</a></h3>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name" colspan="2">What it&#8217;s used for:</th></tr>
+<tr><td>&nbsp;</td><td class="field-body">matplotlib is used to generate visualizations</td>
+</tr>
+<tr class="field"><th class="field-name" colspan="2">What versions have been tested:</th></tr>
+<tr><td>&nbsp;</td><td class="field-body">matplotlib-1.0.1</td>
+</tr>
+<tr class="field"><th class="field-name" colspan="2">How is it installed?:</th></tr>
+<tr><td>&nbsp;</td><td class="field-body">Precompiled binaries are available for matplotlib for OS X and Windows and are available <a class="reference external" href="http://sourceforge.net/projects/matplotlib/files/matplotlib/matplotlib-1.0.1/">here</a>.  Detailed instructions for installation, including from source code, are available <a class="reference external" href="http://matplotlib.sourceforge.net/users/installing.html">here</a>.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="section" id="workflow">
+<h1>Workflow<a class="headerlink" href="#workflow" title="Permalink to this headline">¶</a></h1>
+<p>Enrich performs a series of tasks. Each of the tasks in the Enrich pipeline require as input the output of previous steps, and each step writes its output in the <a class="reference internal" href="#project-directory"><em>project directory</em></a>.</p>
+<ol class="arabic simple">
+<li>Filtration of raw FASTQ files using an index or barcode read to isolate reads of interest (<a class="reference internal" href="#id9"><em>fastq_filter</em></a>)</li>
+<li>Fusion of read pairs to create a single finished sequence for each read pair (<a class="reference internal" href="#id11"><em>read_fuser</em></a>)</li>
+<li>Alignment of each finished sequence (translated and untranslated) to a canonical sequence, with enumeration of mutations and quality filtration (<a class="reference internal" href="#id13"><em>read_aligner</em></a>)</li>
+<li>Identification and counting of each unique variant (<a class="reference internal" href="#id15"><em>map_counts</em></a>)</li>
+<li>Calculation of enrichment ratios between the unselected and selected libraries for each variant (<a class="reference internal" href="#id17"><em>map_ratios</em></a>)</li>
+<li>Unlinking of variants bearing multiple mutations (<a class="reference internal" href="#id19"><em>map_unlink</em></a>)</li>
+<li>Graphical output (<a class="reference internal" href="#id21"><em>enrich_plot</em></a>)</li>
+</ol>
+</div>
+<div class="section" id="input-data-requirements">
+<h1>Input data requirements<a class="headerlink" href="#input-data-requirements" title="Permalink to this headline">¶</a></h1>
+<p>Enrich takes up to two pairs of FASTQ formatted files as input. Enrich has currently only been tested with FASTQ files generated from the Illumina platform. Each Enrich run requires an input, or unselected, set of reads and a selected set of reads.  Each of these reads can come from single-end sequencing or they can be created from paired-end sequencing data. If paired-end sequencing was used, the input and selected reads will each have a forward and reverse read.  These forward and reverse reads can overlap completely (e.g. the first base of the forward read is the last base of the reverse read) or they can be completely discontinuous (e.g. the last base of the forward read meets the last base of the reverse read).</p>
+<p>Input files can have any name, but cannot contain a &#8216;.&#8217; character other than the &#8216;.fq&#8217; extension. Each entry in the FASTQ file must have a unique header (first line).  Additionally, if the data is from an Illumina instrument, the chastity bit is commonly encoded in this line. Thus, the <em>chaste</em> <a class="reference internal" href="#configuration"><em>configuration element</em></a> should only be set to <em>y</em> if the input files contain properly formatted header lines (see <a class="reference internal" href="#id13"><em>read_aligner</em></a>)</p>
+</div>
+<div class="section" id="enrich-modes-of-operation">
+<h1>Enrich modes of operation<a class="headerlink" href="#enrich-modes-of-operation" title="Permalink to this headline">¶</a></h1>
+<p>Enrich can be operated in either interactive or command line mode.</p>
+<div class="section" id="interactive-mode">
+<span id="id7"></span><h2>Interactive mode<a class="headerlink" href="#interactive-mode" title="Permalink to this headline">¶</a></h2>
+<p>Interactive mode is a menu-based option for running Enrich that requires minimal knowledge of the command line. Interactive mode guides the user through the pipeline. Interactive mode can be accessed simply by typing <tt class="docutils literal"><span class="pre">enrich</span></tt>.  If Enrich is invoked from the command line with an invalid option, it will default into interactive mode.</p>
+</div>
+<div class="section" id="command-line-mode">
+<span id="id8"></span><h2>Command line mode<a class="headerlink" href="#command-line-mode" title="Permalink to this headline">¶</a></h2>
+<p>Command line mode enables the user to run Enrich from the command line, and takes both options and arguments.</p>
+<p>Valid options are as follows:</p>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">--help</span></kbd></td>
+<td>print the list of valid options</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--mode <var>MODE</var></span></kbd></td>
+<td>indicates which operation Enrich should perform - valid options are <a class="reference internal" href="#project-directory"><em>initialize</em></a>, <a class="reference internal" href="#configuration"><em>configure</em></a>, <a class="reference internal" href="#example"><em>example</em></a>, <a class="reference internal" href="#id9"><em>fastq_filter</em></a>, <a class="reference internal" href="#id11"><em>read_fuse</em></a>, <a class="reference internal" href="#id13"><em>read_align</em></a>, <a class="reference internal" href="#id15"><em>map_counts</em></a>, <a class="reference internal" href="#id17"><em>map_ratios</em></a>, <a class="reference internal" href="#id19"><em>map_unlink</em></a>, <a class="reference internal" href="#id21"><em>plot</em></a>, and run_all</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">--config_file <var>FILE</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>required for some modes, indicates the exact path to the configuration file</td></tr>
+</tbody>
+</table>
+<p>Enrich also takes arguments in addition to the ones mentioned above, which are simply separated by spaces (if multiple) and modify the behavior of Enrich without having to edit the configuration file.  Arguments can be omitted.  Valid arguments are as follows:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">nowait:</th><td class="field-body">If the configuration file specifies a cluster run (i.e. local = SGE), then the nowait argument prevents Enrich from waiting until job completion to exit.  The nowait argument has no effect on <a class="reference internal" href="#id11"><em>read_fuser</em></a>, because job completion is necessary before atomized output files can be recombined.</td>
+</tr>
+</tbody>
+</table>
+<p>Here is an example command line mode invocation, using the nowait argument:</p>
+<div class="highlight-python"><pre>enrich --mode MODE --config_file CONFIG_FILE nowait</pre>
+</div>
+</div>
+</div>
+<div class="section" id="the-enrich-project-directory">
+<span id="project-directory"></span><h1>The Enrich project directory<a class="headerlink" href="#the-enrich-project-directory" title="Permalink to this headline">¶</a></h1>
+<p>Enrich is designed to work on a collection of high throughput sequencing files organized into a project.  Enrich will automatically create a new project directory in interactive mode, unless an existing project directory is specified. To create a new Enrich project directory or verify an existing one from the command line do the following:</p>
+<div class="highlight-python"><pre>enrich --mode initialize /path/to/new/project/directory/</pre>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">In general, Enrich must be given complete, not relative paths (e.g. /path/to/directory/ not ../../relative/path)</p>
+</div>
+<dl class="docutils">
+<dt>An Enrich project directory will have the following structure:</dt>
+<dd><div class="first last line-block">
+<div class="line"><em>project_directory/</em></div>
+<div class="line-block">
+<div class="line"><em>input/</em></div>
+<div class="line"><em>data/raw/</em></div>
+<div class="line"><em>data/output/</em></div>
+<div class="line"><em>data/tmp/</em></div>
+<div class="line"><em>log/</em></div>
+<div class="line"><em>plots/</em></div>
+</div>
+</div>
+</dd>
+</dl>
+<p>The <em>input</em> directory contains Enrich configuration files. The <em>data/raw/</em> directory contains raw FASTQ that Enrich takes as input. The <em>data/output/</em> directory contains finished <a class="reference internal" href="#enrich-output-files"><em>Enrich output files</em></a>, produced by the <a class="reference internal" href="#id15"><em>map_counts</em></a>, <a class="reference internal" href="#id17"><em>map_ratios</em></a>, and <a class="reference internal" href="#id19"><em>map_unlink</em></a> modules.  The <em>data/tmp/</em> directory contains intermediate <a class="reference internal" href="#enrich-output-files"><em>Enrich output files</em></a> produced by <a class="reference internal" href="#id9"><em>fastq_filter</em></a>, <a class="reference internal" href="#id11"><em>read_fuser</em></a>, and <a class="reference internal" href="#id13"><em>read_aligner</em></a>. The <em>log/</em> directory contains <a class="reference internal" href="#logging"><em>logs</em></a> for each Enrich module. The <em>plots/</em> directory contains plots produced by the <a class="reference internal" href="#id21"><em>enrich_plot</em></a> module.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">After initializing a new Enrich project directory, place your input files in <em>project_directory/data/raw/</em>. You can create new directories within the project directory (e.g. <em>project_directory/py/</em> or <em>project_directory/R/</em> if you have additional, project specific Python or R code).  However, you may not move or rename the directories listed above. You can have an arbitrary number of project directories in any location you choose.</p>
+</div>
+</div>
+<div class="section" id="enrich-configuration-files">
+<span id="configuration"></span><h1>Enrich Configuration files<a class="headerlink" href="#enrich-configuration-files" title="Permalink to this headline">¶</a></h1>
+<p>Enrich uses an XML-based configuration file for each run. Configuration files are stored in the <em>project_directory/input/</em> directory, and a default configuration file <em>enrich_default_config</em> is provided. A <a class="reference internal" href="#project-directory"><em>project directory</em></a> can have many configuration files specifying a variety of input files, processing modes and other options.  Enrich has a guided configuration file generation capacity, which can be accessed from <a class="reference internal" href="#interactive-mode"><em>interactive mode</em></a> or by doing the following from the command line:</p>
+<div class="highlight-python"><pre>enrich --mode configure</pre>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Configuration files can be edited manually. However, configuration elements should not be added or deleted, because each configuration file is checked against the default file to ensure that all elements are present. Additionally, the default configuration file cannot be moved or renamed, nor can its configuration elements be altered.  However, you can change default values in the default configuration file to make generating new configuration files less laborious.</p>
+</div>
+<p>Below is a list of each element in the configuration file and its meaning. For detailed explanations, see the appropriate section describing the relevant <a class="reference internal" href="#pipeline-elements"><em>pipeline element</em></a>.</p>
+<div class="section" id="configuration-file-elements">
+<h2>Configuration file elements<a class="headerlink" href="#configuration-file-elements" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="general-information">
+<h3><em class="xref std std-ref">general information</em><a class="headerlink" href="#general-information" title="Permalink to this headline">¶</a></h3>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">filename:</th><td class="field-body">The name of the configuration file</td>
+</tr>
+<tr class="field"><th class="field-name">path:</th><td class="field-body">The path to the <a class="reference internal" href="#project-directory"><em>project directory</em></a>.  <strong>The path must terminate with a /</strong></td>
+</tr>
+<tr class="field"><th class="field-name" colspan="2">input_read1_filename:</th></tr>
+<tr><td>&nbsp;</td><td class="field-body">Name of the input library first read</td>
+</tr>
+<tr class="field"><th class="field-name" colspan="2">input_read2_filename:</th></tr>
+<tr><td>&nbsp;</td><td class="field-body">Name of the input library second read</td>
+</tr>
+<tr class="field"><th class="field-name" colspan="2">sel_read1_filename:</th></tr>
+<tr><td>&nbsp;</td><td class="field-body">Name of the selected library first read</td>
+</tr>
+<tr class="field"><th class="field-name" colspan="2">sel_read2_filename:</th></tr>
+<tr><td>&nbsp;</td><td class="field-body">Name of the selected library second read</td>
+</tr>
+<tr class="field"><th class="field-name">local:</th><td class="field-body">Indicates whether the Enrich run will be local or in a cluster environment (<em>L</em> = local, <em>SGE</em> = Sun Grid Engine)</td>
+</tr>
+<tr class="field"><th class="field-name">run_name:</th><td class="field-body">The name of the run</td>
+</tr>
+<tr class="field"><th class="field-name">wtDNA:</th><td class="field-body">DNA sequence to which the fused read pair will be aligned</td>
+</tr>
+<tr class="field"><th class="field-name">wtPRO:</th><td class="field-body">Translation of wtDNA sequence, automatically generated</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="fastq-filter">
+<h3><a class="reference internal" href="#id9"><em>fastq_filter</em></a><a class="headerlink" href="#fastq-filter" title="Permalink to this headline">¶</a></h3>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">run_filter:</th><td class="field-body">If y, FASTQ files will be filtered to recover relevant sequences</td>
+</tr>
+<tr class="field"><th class="field-name">index_file:</th><td class="field-body">FASTQ file containing index reads</td>
+</tr>
+<tr class="field"><th class="field-name" colspan="2">index_mismatch_threshold:</th></tr>
+<tr><td>&nbsp;</td><td class="field-body">The maximum number of mismatches between the canonical index sequence and a read index sequence permitted</td>
+</tr>
+<tr class="field"><th class="field-name">index_mode:</th><td class="field-body">Indicates whether fastq_filter should use an index read or, alternately, should use the first 20 bases of the read itself for filtration (<em>index</em> = use an index read, <em>N_include</em> = use the read sequence and count &#8216;N&#8217; bases toward the mismatch threshold, <em>N_exclude</em> = use the read sequence and do not count &#8216;N&#8217; bases toward the mismatch threshold)</td>
+</tr>
+<tr class="field"><th class="field-name">index_sequence:</th><td class="field-body">If an index read is present, this is the expected index sequence</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="read-fuser">
+<h3><a class="reference internal" href="#id11"><em>read_fuser</em></a><a class="headerlink" href="#read-fuser" title="Permalink to this headline">¶</a></h3>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">fuser_mode:</th><td class="field-body">Indicates whether paired reads are present and, if so, whether they should both be used (<em>B</em> = both reads, <em>R1</em> = read1, or <em>R2</em> = read2)</td>
+</tr>
+<tr class="field"><th class="field-name" colspan="2">input_read1_filename_fuser:</th></tr>
+<tr><td>&nbsp;</td><td class="field-body">An automatically generated input library first read filename for the read_fuser function</td>
+</tr>
+<tr class="field"><th class="field-name" colspan="2">input_read2_filename_fuser:</th></tr>
+<tr><td>&nbsp;</td><td class="field-body">An automatically generated input library second read filename for the read_fuser function</td>
+</tr>
+<tr class="field"><th class="field-name" colspan="2">sel_read1_filename_fuser:</th></tr>
+<tr><td>&nbsp;</td><td class="field-body">An automatically generated selected library first read filename for the read_fuser function</td>
+</tr>
+<tr class="field"><th class="field-name" colspan="2">sel_read2_filename_fuser:</th></tr>
+<tr><td>&nbsp;</td><td class="field-body">An automatically generated selected library second read filename for the read_fuser function</td>
+</tr>
+<tr class="field"><th class="field-name" colspan="2">read1_overlap_end:</th></tr>
+<tr><td>&nbsp;</td><td class="field-body">An integer indicating where the read overlap region ends, relative to the first read</td>
+</tr>
+<tr class="field"><th class="field-name" colspan="2">read1_overlap_start:</th></tr>
+<tr><td>&nbsp;</td><td class="field-body">An integer indicating where the read overlap region starts, relative to the first read</td>
+</tr>
+<tr class="field"><th class="field-name" colspan="2">read2_overlap_end:</th></tr>
+<tr><td>&nbsp;</td><td class="field-body">An integer indicating where the read overlap region ends, relative to the second read</td>
+</tr>
+<tr class="field"><th class="field-name" colspan="2">read2_overlap_start:</th></tr>
+<tr><td>&nbsp;</td><td class="field-body">An integer indicating where the read overlap region starts, relative to the second read</td>
+</tr>
+<tr class="field"><th class="field-name" colspan="2">include_nonoverlap_region:</th></tr>
+<tr><td>&nbsp;</td><td class="field-body">If y, the 5&#8217; nonoverlapping regions from the first and second reads will be appended to the specified overlap region</td>
+</tr>
+<tr class="field"><th class="field-name">run_aligner:</th><td class="field-body">If y, a Needleman-Wunsch alignment will be performed on each read pair if the number of mismatches exceeds that specified in paired_mismatch_threshold</td>
+</tr>
+<tr class="field"><th class="field-name" colspan="2">paired_mismatch_threshold:</th></tr>
+<tr><td>&nbsp;</td><td class="field-body">The number of mismatches between read pairs required to trigger alignment</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="read-aligner">
+<h3><a class="reference internal" href="#id13"><em>read_aligner</em></a><a class="headerlink" href="#read-aligner" title="Permalink to this headline">¶</a></h3>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name" colspan="2">input_filename_aligner:</th></tr>
+<tr><td>&nbsp;</td><td class="field-body">An automatically generated input library filename for the read_aligner function</td>
+</tr>
+<tr class="field"><th class="field-name" colspan="2">sel_filename_aligner:</th></tr>
+<tr><td>&nbsp;</td><td class="field-body">An automatically generated selected library filename for the read_aligner function</td>
+</tr>
+<tr class="field"><th class="field-name" colspan="2">unresolvable_max:</th></tr>
+<tr><td>&nbsp;</td><td class="field-body">The maximum number of unresolvable bases to permit</td>
+</tr>
+<tr class="field"><th class="field-name" colspan="2">maximum_mutation_run:</th></tr>
+<tr><td>&nbsp;</td><td class="field-body">The maximum number of consecutive DNA mutations to permit</td>
+</tr>
+<tr class="field"><th class="field-name">avg_quality:</th><td class="field-body">The minimum average QPhred scaled quality score to permit</td>
+</tr>
+<tr class="field"><th class="field-name">chaste:</th><td class="field-body">If y, reads failing the Illumina chastity filter will be excluded (note: this information needs to be in a specific place in the FASTQ header)</td>
+</tr>
+<tr class="field"><th class="field-name">Ncount_max:</th><td class="field-body">The maximum number of bases called as &#8216;N&#8217; to permit</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="map-counts">
+<h3><a class="reference internal" href="#id15"><em>map_counts</em></a><a class="headerlink" href="#map-counts" title="Permalink to this headline">¶</a></h3>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name" colspan="2">input_filename_map_counts:</th></tr>
+<tr><td>&nbsp;</td><td class="field-body">An automatically generated, comma-separated list of input library files for the map_counts function</td>
+</tr>
+<tr class="field"><th class="field-name" colspan="2">sel_filename_map_counts:</th></tr>
+<tr><td>&nbsp;</td><td class="field-body">An automatically generated, comma-separated list of selected library files for the map_counts function</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="map-ratios">
+<h3><a class="reference internal" href="#id17"><em>map_ratios</em></a><a class="headerlink" href="#map-ratios" title="Permalink to this headline">¶</a></h3>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name" colspan="2">input_filename_map_ratios:</th></tr>
+<tr><td>&nbsp;</td><td class="field-body">An automatically generated, comma-separated list of input library files for the map_ratios function</td>
+</tr>
+<tr class="field"><th class="field-name" colspan="2">sel_filename_map_ratios:</th></tr>
+<tr><td>&nbsp;</td><td class="field-body">An automatically generated, comma-separated list of selected library files for the map_ratios function</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="map-unlink">
+<h3><a class="reference internal" href="#id19"><em>map_unlink</em></a><a class="headerlink" href="#map-unlink" title="Permalink to this headline">¶</a></h3>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name" colspan="2">input_filename_map_unlink:</th></tr>
+<tr><td>&nbsp;</td><td class="field-body">An automatically generated, comma-separated list of input library files for the map_unlink function</td>
+</tr>
+<tr class="field"><th class="field-name" colspan="2">sel_filename_map_unlink:</th></tr>
+<tr><td>&nbsp;</td><td class="field-body">An automatically generated, comma-separated list of selected library files for the map_unlink function</td>
+</tr>
+<tr class="field"><th class="field-name">unlink_modes:</th><td class="field-body">A comma-separated list of modes in which to run <a class="reference internal" href="#id19"><em>map_unlink</em></a>.  Currently supported modes are <em>counts</em> and <em>wild_counts</em>.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="enrich-plot">
+<h3><a class="reference internal" href="#id21"><em>enrich_plot</em></a><a class="headerlink" href="#enrich-plot" title="Permalink to this headline">¶</a></h3>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name" colspan="2">input_filename_freqplot:</th></tr>
+<tr><td>&nbsp;</td><td class="field-body">An automatically generated, comma-separated list of input files for the freqplot function</td>
+</tr>
+<tr class="field"><th class="field-name" colspan="2">input_filename_ratioplot:</th></tr>
+<tr><td>&nbsp;</td><td class="field-body">An automatically generated, comma-separated list of input files for the ratioplot function</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="section" id="technical-description-of-pipeline-elements">
+<span id="pipeline-elements"></span><h1>Technical description of pipeline elements<a class="headerlink" href="#technical-description-of-pipeline-elements" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="id9">
+<span id="id10"></span><h2>fastq_filter<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h2>
+<p>The fastq_filter module filters a pair of FASTQ files to identify and selected reads with a particular sequence (or a particular index read sequence). The fastq_filter module exists to deal with multiplexed sequencing data sets, in which multiple libraries have been mixed and sequenced together.  The fastq_filter module can run in one of three modes, identified by the <em>index_mode</em> element of the <a class="reference internal" href="#configuration"><em>enrich run configuration file</em></a>.  If a separate index read is present, the <em>index_mode</em> element should have a value of <em>index</em>.  For each read, fastq_filter examines the index sequence.  If the index sequence matches the <em>index_sequence</em> configuration element with no more than the number of mismatches specified in the <em>index_mismatch_threshold</em> configuration element, the read is considered a match and written into the output file.  If not, the read is discarded.  <em>N_include</em> and <em>N_exclude</em> modes indicate that an index read is not present.  These modes both compare the first 20 bases of each read to the supplied <em>wtDNA</em> configuration element and consider the read a match if it has no more than the number of mismatches specified in the <em>index_mismatch_threshold</em> configuration element.  <em>N_include</em> mode counts &#8216;N&#8217; bases as mismatches, whereas <em>N_exclude</em> mode does not.  The fastq_filter module can be selected in <a class="reference internal" href="#interactive-mode"><em>interactive mode</em></a> or can be invoked from the command line:</p>
+<div class="highlight-python"><pre>enrich --mode fastq_filter --config_file /path/to/the/config_file</pre>
+</div>
+<p>The fastq_filter module produces output in <em>project_directory/data/tmp/</em> and output files are named <em>filename_index_mode_filtered</em></p>
+</div>
+<div class="section" id="id11">
+<span id="id12"></span><h2>read_fuser<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h2>
+<p>The read_fuser module performs several important tasks centered on forming a finished sequence for comparison to the <em>wtDNA</em> configuration element. If overlapping read pairs have been acquired, read_fuser stitches these together using the <em>read1_overlap_start</em>, <em>read1_overlap_end</em>, <em>read2_overlap_start</em>, <em>read2_overlap_end</em>, and <em>include_nonoverlap_region</em> configuration elements.  Here is a schematic of how overlap start and end work:</p>
+<div class="highlight-python"><pre>R1_start&gt;                     |R2_end                             R1_end|                    &lt;R2_start
+        ATGGAAGATTATACCAAAATAGAGAAAATTGGAGAAGG...TACCTATGGAGTTGTGTATAAGGGTAGACACAAAACTACAGGTCA
+        ======================-------------------------------------------=====================
+        nonoverlap region     |overlap region                           |nonoverlap region
+              R1_overlap_start&gt;                                         |R1_overlap_end
+              R2_overlap_start&gt;                                         |R2_overlap_end</pre>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Counting is done from 0, rather than 1. Read2 is considered to be reverse-complemented for the purposes of calculating the overlap start and overlap end.  Thus, in the example above, R2_overlap_start would be 0, whereas read1 start would be at position 22. If the <em>include_nonoverlap_region</em> configuration element were set to <em>y</em>, then the nonoverlap regions above would be appended to the overlapped sequence. Before a full-scale Enrich run is initiated, it is advisable to check that the overlap parameters are set correctly on a small subset of data.</p>
+</div>
+<p>For each forward and reverse read pair, read_fuser checks within the overlap region to make sure that the read pairs agree on the identity of each base. If they do not, then read_fuser examines the quality score of each base and picks the base with the higher score.  If both reads have an identical quality score, the base is considered unresolvable and an &#8216;X&#8217; is inserted in the finished sequence at the unresolvable position.  The read_fuser module also calculates a compound quality score estimate at each position, equal to the product of the two quality scores at that position if the two reads agree on the identity of the position.  If the reads do not agree, the higher quality score is used.  Positions in nonoverlapped regions are assigned their single-read quality score.</p>
+<p>In the event that only one read is present, the overlap start and end configuration elements can be used to specify the beginning and end of the region of interest. Finished sequences within that region are generated. If only a reverse read is specified, then each read will be reverse-complemented before production of a finished sequence.</p>
+<p>If the <em>run_aligner</em> configuration element is set to <em>y</em>, then a Needleman-Wunsch alignment is performed for each read pair which disagrees at more positions than specified in the <em>paired_mismatch_threshold</em> configuration element. Generally, read pairs that contain a large number of mismatches represent deletions within the region of interest and the Needleman-Wunch alignment produces a gap.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Running the Needleman-Wunsch alignment algorithm substantially increases the time required for read_fuser to run.  Gapped sequences are removed by virtue of their large number of paired read mismatches, so running the alignment algorithm is not usually necessary.</p>
+</div>
+<p>The read_fuser module can be selected in <a class="reference internal" href="#interactive-mode"><em>interactive mode</em></a> or can be invoked from the command line:</p>
+<div class="highlight-python"><pre>enrich --mode read_fuse --config_file /path/to/the/config_file</pre>
+</div>
+<p>The read_fuser module produces output in <em>project_directory/data/tmp/</em> and <em>project_directory/data/tmp/parts/</em> and output files are named <em>filename_fuser_mode</em></p>
+</div>
+<div class="section" id="id13">
+<span id="id14"></span><h2>read_aligner<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h2>
+<p>The read_aligner module translates each finished sequence and then aligns both the DNA and protein sequences to the <em>wtDNA</em> and <em>wtPRO</em> configuration elements.  For the sake of speed, no alignment algorithm is used. Instead a simple base-by-base comparison is made. The read_aligner module also filters the output sequences on a number of parameters. The <em>unresolvable_max</em> configuration element specifies the maximum number of unresolvable bases (see <a class="reference internal" href="#id11"><em>read_fuser</em></a>) to permit, and should generally be set to 0. The <em>maximum_mutation_run</em> configuration element specifies the maximum number of consecutive DNA mutations to permit. In a lightly mutagenized library, reads with a large number (&gt;3) of consecutive mutations are generally sequencing errors. The <em>avg_quality</em> configuration element specifies the minimum read-average QPhred quality score to permit, and is generally set to 20.  The <em>chaste</em> configuration element specifies whether reads that have failed the Illumina quality chastity filter should be included, and is generally set to &#8216;n&#8217;. Enrich will look for chastity bits encoded with <tt class="docutils literal"><span class="pre">1/0</span></tt> or <tt class="docutils literal"><span class="pre">Y/N</span></tt> in the header line of each FASTQ entry, formatted as follows:</p>
+<blockquote>
+<div>&#64;&lt;MachineName&gt;:&lt;Lane #&gt;:&lt;Tile #&gt;:&lt;X coordinate&gt;:&lt;Y coordinate&gt;:&lt;Chastity bit&gt;#&lt;Index Read&gt;/&lt;Read Number&gt;</div></blockquote>
+<p>If your FASTQ header is not formatted similarly you should set <em>chaste</em> to <em>n</em>. If the chastity bit is encoded with a characters other than <tt class="docutils literal"><span class="pre">1/0</span></tt> or <tt class="docutils literal"><span class="pre">Y/N</span></tt>, it will be ignored. The <em>Ncount_max</em> configuration element specifies the maximum number of &#8216;N&#8217; bases a read may contain, and is generally set to 0.</p>
+<p>The read_aligner module can be selected in <a class="reference internal" href="#interactive-mode"><em>interactive mode</em></a> or can be invoked from the command line:</p>
+<div class="highlight-python"><pre>enrich --mode read_align --config_file /path/to/the/config_file</pre>
+</div>
+<p>The read_aligner module produces output in <em>project_directory/data/tmp/</em> and output files are named either <em>filename_DNA_qc</em> for untranslated sequences or <em>filename_PRO_qc</em> for translated sequences.</p>
+</div>
+<div class="section" id="id15">
+<span id="id16"></span><h2>map_counts<a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h2>
+<p>The map_counts module identifies unique variants in read_aligner output files and produces an output file that contains a list of those unique sequences as well as the number of times they appear normalized by the total number of counts in the input file (i.e. the frequency).  The frequency for a given variant, v, in the library X (<img class="math" src="_images/math/11a0aea762c6b05a78094152ffafef5a06cd03db.png" alt="F_{v,X}"/>) is:</p>
+<div class="math">
+<p><img src="_images/math/bf9a726e28a5db7a9462d1772ee6fb0aefd1b5cd.png" alt="F_{v,X} = \frac{reads_{v,X}}{\sum{reads_{X}}}" /></p>
+</div><p>The map_counts module can be selected in <a class="reference internal" href="#interactive-mode"><em>interactive mode</em></a> or can be invoked from the command line:</p>
+<div class="highlight-python"><pre>enrich --mode map_counts --config_file /path/to/the/config_file</pre>
+</div>
+<p>The map_counts module produces output in <em>project_directory/data/</em> and output files are named <em>counts_filename</em> (containing all sequences), <em>counts_filename.m1</em> (containing only sequences with single mutations) and <em>counts_filename.m2</em> (containing only sequences with double mutations)</p>
+</div>
+<div class="section" id="id17">
+<span id="id18"></span><h2>map_ratios<a class="headerlink" href="#id17" title="Permalink to this headline">¶</a></h2>
+<p>The map_ratios module uses variant frequencies generated by <a class="reference internal" href="#id15"><em>map_counts</em></a> to calculate enrichment ratios for each variant that occurs in both the unselected and selected <a class="reference internal" href="#id15"><em>map_counts</em></a> output files.  The enrichment ratio for a given variant, v, in the selected library X (<img class="math" src="_images/math/fcb7fb4ea36beb68979b2eea42b44b581b911f05.png" alt="E_{v,X}"/>) is:</p>
+<div class="math">
+<p><img src="_images/math/911ab52656c8dd6e39a81ef38dec0ad1bee6bf69.png" alt="E_{v,X} = \frac{F_{v,X}}{F_{v,input}}" /></p>
+</div><p>where <img class="math" src="_images/math/629f2831ce1a33fcc50eb3a1dbbe24283c776b4b.png" alt="F_v"/> is the frequency of the variant v (see <a class="reference internal" href="#id15"><em>map_counts</em></a>).</p>
+<p>The map_ratios module also uses a two-sided Possion exact test using a python port of the R <a class="reference external" href="http://svn.r-project.org/R/trunk/src/library/stats/R/poisson.test.R">poisson.test</a> function to calculate a p-value for the significance of enrichment or depletion for each variant and then performs multiple testing correction using a python port of the R module <a class="reference external" href="http://cran.r-project.org/src/contrib/qvalue_1.26.0.tar.gz">qvalue</a> function to produce a q-value. Due to differences in the scipy smoothing spline function, the python port uses the bootstrap method for choosing the tuning paramater in the estimation of pi0.</p>
+<p>The map_ratios module can be selected in <a class="reference internal" href="#interactive-mode"><em>interactive mode</em></a> or can be invoked from the command line:</p>
+<div class="highlight-python"><pre>enrich --mode map_ratios --config_file /path/to/the/config_file</pre>
+</div>
+<p>The map_ratios module produces output in <em>project_directory/data/</em> and output files are named <em>ratios_filename</em></p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">This module depends on Scipy to calculate cumulative densities from the Poisson distribution. If Scipy cannot be imported, p-values will be reported as NaN</p>
+</div>
+</div>
+<div class="section" id="id19">
+<span id="id20"></span><h2>map_unlink<a class="headerlink" href="#id19" title="Permalink to this headline">¶</a></h2>
+<p>The map_unlink module uses unique variant counts generated by <a class="reference internal" href="#id15"><em>map_counts</em></a> to calculate unlinked mutation frequencies for all possible single mutants from all variants. Variants with multiple mutations are unlinked; the variant frequency is added to each of the single mutants comprising the multiply mutated variant.  The map_unlink module can be invoked in multiple modes.  Currently supported modes are <em>counts</em> and <em>wild_counts</em>. The difference between <em>counts</em> and <em>wild_counts</em> is that for <em>counts</em>, only positions that differ from wild type (i.e. mutations) are ennumerated, whereas for <em>wild_counts</em>, all positions for each variant are included in the calculation regardless of the identity of the amino acid. In other words, in <em>counts</em> mode the map_unlink calculation at each position yields the frequency of mutant amino acids only whereas the <em>wild_counts</em> mode yields the frequency of all amino acids including wild type. Thus, the unlinked frequency at the i<sup>th</sup> position bearing the j<sup>th</sup> amino acid in library X (<img class="math" src="_images/math/7983cf6125f82501fc5ba586072a15d1f097e2e0.png" alt="Fu_{i,j,X}"/>) is:</p>
+<div class="math">
+<p><img src="_images/math/b3aecb6490e17f364db5b48a00eb4188d90d972d.png" alt="Fu_{i,j,X} = \sum{F_{i,j,X}}" /></p>
+</div><p>for non-wild type i,j combinations in <em>counts</em> mode and for all i,j combinations in <em>wild_counts</em> mode.</p>
+<p>The map_unlink module can be selected in <a class="reference internal" href="#interactive-mode"><em>interactive mode</em></a> or can be invoked from the command line:</p>
+<div class="highlight-python"><pre>enrich --mode map_unlink --config_file /path/to/the/config_file</pre>
+</div>
+<p>The map_unlink module produces output in <em>project_directory/data/</em> and output files are named <em>mode_filename</em> where <em>mode</em> is the mode in which map_unlink was run.</p>
+</div>
+<div class="section" id="id21">
+<span id="id22"></span><h2>enrich_plot<a class="headerlink" href="#id21" title="Permalink to this headline">¶</a></h2>
+<p>The enrich_plot module <a class="reference internal" href="#dependencies"><em>depends</em></a> on matplotlib to produce a number of visualizations. The visualization tools included with Enrich are intended as a starting point for further analyses, and it is expected that each user will likely want to generate project-specific visualizations. Enrich_plot generates the following visualizations:</p>
+<div class="section" id="visual-estimation-of-library-diversity">
+<h3>Visual estimation of library diversity<a class="headerlink" href="#visual-estimation-of-library-diversity" title="Permalink to this headline">¶</a></h3>
+<p>This plot shows the mutational frequency at each position for each possible amino acid substitution within a given library, and is generated from the <a class="reference internal" href="#id19"><em>map_unlink</em></a> file for that library. This plot is named <em>unlink_counts_library_diversity.pdf</em>.</p>
+</div>
+<div class="section" id="position-averaged-mutation-enrichment">
+<h3>Position-averaged mutation enrichment<a class="headerlink" href="#position-averaged-mutation-enrichment" title="Permalink to this headline">¶</a></h3>
+<p>This plot shows the average enrichment ratio at each position. The unselected and selected <a class="reference internal" href="#id19"><em>map_unlink</em></a> files are used to calculate an enrichment ratio for all possible single mutants. These ratios are then averaged by position. A ratio of 1 indicates that mutations at that position neither enriched nor depleted during selection, while values &gt; 1 indicate enrichment and values &lt; 1 indicate depletion. This plot is named <em>unlink_counts_selected_library_unlink_counts_unselected_library_position_enrichment.pdf</em></p>
+</div>
+<div class="section" id="all-residue-enrichment-ratio-scan">
+<h3>All-residue enrichment ratio scan<a class="headerlink" href="#all-residue-enrichment-ratio-scan" title="Permalink to this headline">¶</a></h3>
+<p>These plots shows the enrichment ratio for all possible single mutations organized either by position or by amino acid. The unselected and selected <a class="reference internal" href="#id19"><em>map_unlink</em></a> files are used to calculate an enrichment ratio for each mutation.  These ratios are log<sub>2</sub> transformed, so values &lt; 0 indicate depletion whereas values &gt; 0 indicate enrichment.  Measured values are indicated by blue dots. Missing data are indicated by grey boxes and position-amino acid combinations that correspond to the wild type sequence are denoted by red boxes.  These plots are named <em>unlink_counts_selected_library_unlink_counts_unselected_library_all_residue_by_Pos.pdf</em> if organized by position or <em>unlink_counts_selected_library_unlink_counts_unselected_library_all_residue_by_AA.pdf</em> if organized by amino acid.</p>
+</div>
+</div>
+</div>
+<div class="section" id="enrich-output-files">
+<span id="id23"></span><h1>Enrich output files<a class="headerlink" href="#enrich-output-files" title="Permalink to this headline">¶</a></h1>
+<p>Each segment of the Enrich pipeline produces human-readable tab delimited text output files. Each file contains a descriptive header. All output files are retained because it is expected that each user will likely have a number of project-specific questions they would like to answer.  Output from the earlier parts of the pipeline, which are less likely to be of interest, are kept in <em>project_directory/data/output/tmp/</em> whereas finished <a class="reference internal" href="#id15"><em>map_counts</em></a>, <a class="reference internal" href="#id17"><em>map_ratios</em></a> and <a class="reference internal" href="#id19"><em>map_unlink</em></a> files are kept in <em>project_directory/data/output/</em>.  Plots generated by Enrich are kept in <em>project_directory/plots/</em>.  For detailed information about the location and naming of pipeline output files, see the relevant <a class="reference internal" href="#pipeline-elements"><em>pipeline element</em></a> description.</p>
+<div class="section" id="enrich-run-logs">
+<span id="logging"></span><h2>Enrich run logs<a class="headerlink" href="#enrich-run-logs" title="Permalink to this headline">¶</a></h2>
+<p>If the <em>local</em> <a class="reference internal" href="#configuration"><em>configuration element</em></a> is set to <em>SGE</em>, each <a class="reference internal" href="#pipeline-elements"><em>pipeline_element</em></a> generates a log file.  The log files are found in <em>project_directory/log/</em> and contain, for each instance of the pipeline element in question, the time it began running, the parameters it was passed and any relevant error messages.  Log files are not deleted, regenerated, compressed or managed in any way.  Thus, it is conceivable a very large project that runs many, many times could generate unwieldy log files.</p>
+</div>
+</div>
+<div class="section" id="enrich-example">
+<span id="example"></span><h1>Enrich Example<a class="headerlink" href="#enrich-example" title="Permalink to this headline">¶</a></h1>
+<p>Enrich comes with a small example data set and accompanying configuration files for the purpose of testing Enrich installs.  To create an example <a class="reference internal" href="#project-directory"><em>project directory</em></a> from the command line, type:</p>
+<div class="highlight-python"><pre>enrich --mode example /path/to/desired/example/directory</pre>
+</div>
+<p>This project directory contains test data as well as two configuration files: <em>example_local_config</em> and <em>example_SGE_config</em>.  If Enrich is properly installed, the entire pipeline can be tested using these configuration files and the <tt class="docutils literal"><span class="pre">--run_all</span></tt> <a class="reference internal" href="#command-line-mode"><em>command line mode</em></a> option.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Enrich 0.2 documentation</a></li>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#installation">Installation</a><ul>
+<li><a class="reference internal" href="#installation-on-a-cluster">Installation on a cluster</a></li>
+<li><a class="reference internal" href="#dependencies">Dependencies</a><ul>
+<li><a class="reference internal" href="#drmaa">DRMAA</a></li>
+<li><a class="reference internal" href="#numpy-and-scipy">Numpy and Scipy</a></li>
+<li><a class="reference internal" href="#biopython">Biopython</a></li>
+<li><a class="reference internal" href="#matplotlib">Matplotlib</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#workflow">Workflow</a></li>
+<li><a class="reference internal" href="#input-data-requirements">Input data requirements</a></li>
+<li><a class="reference internal" href="#enrich-modes-of-operation">Enrich modes of operation</a><ul>
+<li><a class="reference internal" href="#interactive-mode">Interactive mode</a></li>
+<li><a class="reference internal" href="#command-line-mode">Command line mode</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#the-enrich-project-directory">The Enrich project directory</a></li>
+<li><a class="reference internal" href="#enrich-configuration-files">Enrich Configuration files</a><ul>
+<li><a class="reference internal" href="#configuration-file-elements">Configuration file elements</a><ul>
+<li><a class="reference internal" href="#general-information"><tt class="docutils literal"><span class="pre">general</span> <span class="pre">information</span></tt></a></li>
+<li><a class="reference internal" href="#fastq-filter"><tt class="docutils literal"><span class="pre">fastq_filter</span></tt></a></li>
+<li><a class="reference internal" href="#read-fuser"><tt class="docutils literal"><span class="pre">read_fuser</span></tt></a></li>
+<li><a class="reference internal" href="#read-aligner"><tt class="docutils literal"><span class="pre">read_aligner</span></tt></a></li>
+<li><a class="reference internal" href="#map-counts"><tt class="docutils literal"><span class="pre">map_counts</span></tt></a></li>
+<li><a class="reference internal" href="#map-ratios"><tt class="docutils literal"><span class="pre">map_ratios</span></tt></a></li>
+<li><a class="reference internal" href="#map-unlink"><tt class="docutils literal"><span class="pre">map_unlink</span></tt></a></li>
+<li><a class="reference internal" href="#enrich-plot"><tt class="docutils literal"><span class="pre">enrich_plot</span></tt></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#technical-description-of-pipeline-elements">Technical description of pipeline elements</a><ul>
+<li><a class="reference internal" href="#id9">fastq_filter</a></li>
+<li><a class="reference internal" href="#id11">read_fuser</a></li>
+<li><a class="reference internal" href="#id13">read_aligner</a></li>
+<li><a class="reference internal" href="#id15">map_counts</a></li>
+<li><a class="reference internal" href="#id17">map_ratios</a></li>
+<li><a class="reference internal" href="#id19">map_unlink</a></li>
+<li><a class="reference internal" href="#id21">enrich_plot</a><ul>
+<li><a class="reference internal" href="#visual-estimation-of-library-diversity">Visual estimation of library diversity</a></li>
+<li><a class="reference internal" href="#position-averaged-mutation-enrichment">Position-averaged mutation enrichment</a></li>
+<li><a class="reference internal" href="#all-residue-enrichment-ratio-scan">All-residue enrichment ratio scan</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#enrich-output-files">Enrich output files</a><ul>
+<li><a class="reference internal" href="#enrich-run-logs">Enrich run logs</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#enrich-example">Enrich Example</a></li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/enrich.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="index.html">Enrich v0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Douglas M. Fowler.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>

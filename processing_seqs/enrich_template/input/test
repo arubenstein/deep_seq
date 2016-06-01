@@ -1,0 +1,64 @@
+<?xml version = "2.0" ?>
+<enrich_config root_element="TRUE">
+<general_info section="TRUE">
+<filename>test</filename>
+<input_read1_filename>dummy1.fastq</input_read1_filename>
+<input_read2_filename>NONE</input_read2_filename>
+<local>L</local>
+<path>/home/arubenstein/git_repos/deep_seq/processing_seqs/results/enrich/enrich_template/</path>
+<run_name>dummy_run_name</run_name>
+<sel_read1_filename>dummy2.fastq</sel_read1_filename>
+<sel_read2_filename>NONE</sel_read2_filename>
+<wtDNA>GATGAAATGGAAGAA</wtDNA>
+<wtPRO>DEMEE</wtPRO>
+</general_info>
+<fastq_filter section="TRUE">
+<index_mismatch_threshold>NA</index_mismatch_threshold>
+<index_mode>NA</index_mode>
+<index_sequence>NA</index_sequence>
+<input_index_file>NA</input_index_file>
+<run_filter>n</run_filter>
+<sel_index_file>NA</sel_index_file>
+</fastq_filter>
+<read_fuser section="TRUE">
+<fuser_mode>R1</fuser_mode>
+<include_nonoverlap_region>n</include_nonoverlap_region>
+<input_read1_filename_fuser>dummy1.fastq</input_read1_filename_fuser>
+<input_read2_filename_fuser>NONE</input_read2_filename_fuser>
+<paired_mismatch_threshold>0</paired_mismatch_threshold>
+<read1_overlap_end>86</read1_overlap_end>
+<read1_overlap_start>72</read1_overlap_start>
+<read2_overlap_end>0</read2_overlap_end>
+<read2_overlap_start>0</read2_overlap_start>
+<run_aligner>n</run_aligner>
+<sel_read1_filename_fuser>dummy2.fastq</sel_read1_filename_fuser>
+<sel_read2_filename_fuser>NONE</sel_read2_filename_fuser>
+</read_fuser>
+<read_aligner section="TRUE">
+<Ncount_max>0</Ncount_max>
+<avg_quality>20</avg_quality>
+<chaste>n</chaste>
+<gap_max>0</gap_max>
+<input_filename_aligner>dummy1.fast_R1</input_filename_aligner>
+<maximum_mutation_run>15</maximum_mutation_run>
+<sel_filename_aligner>dummy2.fast_R1</sel_filename_aligner>
+<unresolvable_max>0</unresolvable_max>
+</read_aligner>
+<map_counts section="TRUE">
+<input_filename_map_counts>dummy1.fast_R1_PRO_qc,dummy1.fast_R1_DNA_qc</input_filename_map_counts>
+<sel_filename_map_counts>dummy2.fast_R1_PRO_qc,dummy2.fast_R1_DNA_qc</sel_filename_map_counts>
+</map_counts>
+<map_ratios section="TRUE">
+<input_filename_map_ratios>counts_dummy1.fast_R1_PRO_qc,counts_dummy1.fast_R1_DNA_qc</input_filename_map_ratios>
+<sel_filename_map_ratios>counts_dummy2.fast_R1_PRO_qc,counts_dummy2.fast_R1_DNA_qc</sel_filename_map_ratios>
+</map_ratios>
+<map_unlink section="TRUE">
+<input_filename_map_unlink>counts_dummy1.fast_R1_PRO_qc,counts_dummy1.fast_R1_DNA_qc,counts_dummy1.fast_R1_PRO_qc.m1,counts_dummy1.fast_R1_DNA_qc.m1,counts_dummy1.fast_R1_PRO_qc.m2,counts_dummy1.fast_R1_DNA_qc.m2</input_filename_map_unlink>
+<sel_filename_map_unlink>counts_dummy2.fast_R1_PRO_qc,counts_dummy2.fast_R1_DNA_qc,counts_dummy2.fast_R1_PRO_qc.m1,counts_dummy2.fast_R1_DNA_qc.m1,counts_dummy2.fast_R1_PRO_qc.m2,counts_dummy2.fast_R1_DNA_qc.m2</sel_filename_map_unlink>
+<unlink_modes>wild_counts</unlink_modes>
+</map_unlink>
+<enrich_plot section="TRUE">
+<input_filename_freqplot>unlink_wild_counts_dummy1.fast_R1_PRO_qc,unlink_wild_counts_dummy2.fast_R1_PRO_qc</input_filename_freqplot>
+<input_filename_ratioplot>unlink_wild_counts_dummy2.fast_R1_PRO_qc,unlink_wild_counts_dummy1.fast_R1_PRO_qc;unlink_wild_counts_dummy2.fast_R1_PRO_qc.m1,unlink_wild_counts_dummy1.fast_R1_PRO_qc.m1;unlink_wild_counts_dummy2.fast_R1_PRO_qc.m2,unlink_wild_counts_dummy1.fast_R1_PRO_qc.m2</input_filename_ratioplot>
+</enrich_plot>
+</enrich_config>
