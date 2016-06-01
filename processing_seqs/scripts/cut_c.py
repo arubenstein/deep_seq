@@ -64,15 +64,16 @@ def main( argv ):
 
     #open the files for input and output
     fasta_sequences = fasta_iter(infile)
-    with open(output_file,"w") as out_file, open(err_file,"w") as err:
-	for name,sequence in fasta_sequences:
-	    if name == "dummy":
-		continue
-	    new_sequence = comp_seq ( sequence, WT_seq )
-            if new_sequence:
-	        write_fasta(out_file, name, new_sequence )
-	    else:
-		write_fasta( err, name, sequence )
+    with open(output_file,"w") as out_file:
+	with open(err_file,"w") as err:
+	    for name,sequence in fasta_sequences:
+                if name == "dummy":
+		    continue
+		new_sequence = comp_seq ( sequence, WT_seq )
+                if new_sequence:
+	            write_fasta(out_file, name, new_sequence )
+	        else:
+		    write_fasta( err, name, sequence )
 
 if __name__ == "__main__":
     main(sys.argv)

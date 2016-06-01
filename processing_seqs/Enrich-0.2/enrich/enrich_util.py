@@ -43,7 +43,7 @@ def norm_count_dict(count_dict):
     '''define a function that normalizes the counts in a counts dictionary'''
 
     #5/20/16 changed count_dict to filt_dict
-    filt_dict = { seqID : value for seqID, value in count_dict.items() if value >= 10 }
+    filt_dict = dict( (seqID, value) for seqID, value in count_dict.items() if value >= 10 )
 
     norm_dict = {}
     total = 0

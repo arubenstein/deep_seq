@@ -10,7 +10,8 @@ export INPATH=~/git_repos/deep_seq/processing_seqs/ancillary_files/
 export SCRIPTS=~/git_repos/deep_seq/processing_seqs/scripts/
 export ENRICH_BG_LIST=$INPATH'/'enrich_bg_list
 
-easy_install $HOME'/'git_repos/deep_seq/processing_seqs/Enrich-0.2/
+mkdir -p $HOME'/dist-packages/'
+easy_install -d $HOME'/'dist-packages/ $HOME'/'git_repos/deep_seq/processing_seqs/Enrich-0.2/
 
 if [[ $pre_enrich -eq 1 ]]
 then
