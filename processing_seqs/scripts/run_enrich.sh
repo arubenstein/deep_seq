@@ -54,7 +54,7 @@ do
      enrich --mode read_align --config_file $enrich_new_config
      enrich --mode map_counts --config_file $enrich_new_config
      enrich --mode map_ratios --config_file $enrich_new_config
-     enrich --mode map_unlink --config_file $enrich_new_config
+     #enrich --mode map_unlink --config_file $enrich_new_config
 
 done
 
