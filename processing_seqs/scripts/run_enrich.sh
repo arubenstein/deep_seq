@@ -18,6 +18,11 @@ do
      length=$(( ${#actual_fn} - 4 ))
      sel_name=${actual_fn:0:$length}
 
+     if [[ $bg == $sel_name ]]
+     then
+	continue
+     fi
+
      enrich_dir=$outpath'/'$bg'_'$sel_name  
      enrich_def_config=$enrich_dir'/input/enrich_default_config'
      enrich_new_config=$enrich_dir'/input/test'   

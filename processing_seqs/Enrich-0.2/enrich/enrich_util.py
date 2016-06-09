@@ -36,14 +36,24 @@ def build_tally_dict(input_file):
         else:
             tally_dict[mutation_location][mutation_identity] = 1
             properties_dict[mutation_location][mutation_identity] = [sequence, match_count, mutation_count, mutation_location, mutation_identity, max_mutation_run]
-        input_line = input_key.readline()   
-    return tally_dict, properties_dict
+        input_line = input_key.readline()
+
+    filt_tally_dict = {}
+    filt_properties_dict = {}   
+
+    #6/3/16 added this line
+    for mutation_location, mutation_location_dict in tally_dict.items():
+	filt_tally_dict[mutation_location] = dict( (mutation_identity, tally ) for mutation_identity, tally in mutation_location_dict if tally >= 10 )
+	filt_properties_dict[mutation_location] = dict( (mutation_identity, val ) for mutation_identity, val in properties_dict[mutation_location] if mutation_identity in filt_tally_dict[mutation_location])
+
+    return filt_tally_dict, filt_properties_dict
 
 def norm_count_dict(count_dict):
     '''define a function that normalizes the counts in a counts dictionary'''
 
     #5/20/16 changed count_dict to filt_dict
-    filt_dict = dict( (seqID, value) for seqID, value in count_dict.items() if value >= 10 )
+    #6/3/16 took out this part because made it happen in tally dict instead
+    #filt_dict = dict( (seqID, value) for seqID, value in count_dict.items() if value >= 10 )
 
     norm_dict = {}
     total = 0

@@ -130,9 +130,9 @@ def main(path, infile1, infile2, grid = 'L'):
     f_1 = open(path + 'data/output/' + 'ratios_' + input_A_file.split('counts_')[1] + '_' + input_B_file.split('counts_')[1] + '.m1', 'w')
     f_2 = open(path + 'data/output/' + 'ratios_' + input_A_file.split('counts_')[1] + '_' + input_B_file.split('counts_')[1] + '.m2', 'w')
 
-    print >>f, '\t'.join(["seqID","sequence","match_count","mutation_count","mutation_location","mutation_identity","max_mutation_run","log2_ratio", "fractional_fitness", "fractional_wt", "pval", "bonferroni", "qval"])
-    print >>f_1, '\t'.join(["seqID","sequence","match_count","mutation_count","mutation_location","mutation_identity","max_mutation_run","log2_ratio", "fractional_fitness", "fractional_wt", "pval", "bonferroni", "qval"])
-    print >>f_2, '\t'.join(["seqID","sequence","match_count","mutation_count","mutation_location","mutation_identity","max_mutation_run","log2_ratio", "fractional_fitness", "fractional_wt", "pval", "bonferroni", "qval"])
+    print >>f, '\t'.join(["seqID","sequence","match_count","mutation_count","mutation_location","mutation_identity","max_mutation_run","log2_ratio", "fractional_fitness", "fractional_wt", "pval", "bonferroni", "qval", "count_unsel", "count_sel"])
+    print >>f_1, '\t'.join(["seqID","sequence","match_count","mutation_count","mutation_location","mutation_identity","max_mutation_run","log2_ratio", "fractional_fitness", "fractional_wt", "pval", "bonferroni", "qval", "count_unsel", "count_sel"])
+    print >>f_2, '\t'.join(["seqID","sequence","match_count","mutation_count","mutation_location","mutation_identity","max_mutation_run","log2_ratio", "fractional_fitness", "fractional_wt", "pval", "bonferroni", "qval", "count_unsel", "count_sel"])
     
     seqIDs = enrich_util.valuesort(ratio_dict)
     seqIDs.reverse()
@@ -157,13 +157,13 @@ def main(path, infile1, infile2, grid = 'L'):
         except:
             bf = 'NA'
             
-        print >>f, '\t'.join([seqID] + map(str, input_dict[seqID][:6] + [math.log(float(ratio_dict[seqID]),2), float(ratio_dict[seqID])/maxRatio, float(ratio_dict[seqID])/wtRatio] + [poisson, bf, fdr]))
+        print >>f, '\t'.join([seqID] + map(str, input_dict[seqID][:6] + [math.log(float(ratio_dict[seqID]),2), float(ratio_dict[seqID])/maxRatio, float(ratio_dict[seqID])/wtRatio] + [poisson, bf, fdr], count_A_dict[seqID], count_B_dict[seq_ID]))
         
         if input_dict[seqID][2] == '1':
-            print >>f_1, '\t'.join([seqID] + map(str, input_dict[seqID][:6] + [math.log(float(ratio_dict[seqID]),2), float(ratio_dict[seqID])/maxRatio, float(ratio_dict[seqID])/wtRatio] + [poisson, bf, fdr]))
+            print >>f_1, '\t'.join([seqID] + map(str, input_dict[seqID][:6] + [math.log(float(ratio_dict[seqID]),2), float(ratio_dict[seqID])/maxRatio, float(ratio_dict[seqID])/wtRatio] + [poisson, bf, fdr, count_A_dict[seqID], count_B_dict[seq_ID] ]))
             
         if input_dict[seqID][2] == '2':
-            print >>f_2, '\t'.join([seqID] + map(str, input_dict[seqID][:6] + [math.log(float(ratio_dict[seqID]),2), float(ratio_dict[seqID])/maxRatio, float(ratio_dict[seqID])/wtRatio] + [poisson, bf, fdr]))
+            print >>f_2, '\t'.join([seqID] + map(str, input_dict[seqID][:6] + [math.log(float(ratio_dict[seqID]),2), float(ratio_dict[seqID])/maxRatio, float(ratio_dict[seqID])/wtRatio] + [poisson, bf, fdr], count_A_dict[seqID], count_B_dict[seq_ID]))
             
     f.close()
     f_1.close()
