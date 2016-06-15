@@ -157,13 +157,13 @@ def main(path, infile1, infile2, grid = 'L'):
         except:
             bf = 'NA'
             
-        print >>f, '\t'.join([seqID] + map(str, input_dict[seqID][:6] + [math.log(float(ratio_dict[seqID]),2), float(ratio_dict[seqID])/maxRatio, float(ratio_dict[seqID])/wtRatio] + [poisson, bf, fdr], count_A_dict[seqID], count_B_dict[seq_ID]))
+        print >>f, '\t'.join([seqID] + map(str, input_dict[seqID][:6] + [math.log(float(ratio_dict[seqID]),2), float(ratio_dict[seqID])/maxRatio, float(ratio_dict[seqID])/wtRatio] + [poisson, bf, fdr, count_A_dict[seqID], count_B_dict[seqID] ]))
         
         if input_dict[seqID][2] == '1':
-            print >>f_1, '\t'.join([seqID] + map(str, input_dict[seqID][:6] + [math.log(float(ratio_dict[seqID]),2), float(ratio_dict[seqID])/maxRatio, float(ratio_dict[seqID])/wtRatio] + [poisson, bf, fdr, count_A_dict[seqID], count_B_dict[seq_ID] ]))
+            print >>f_1, '\t'.join([seqID] + map(str, input_dict[seqID][:6] + [math.log(float(ratio_dict[seqID]),2), float(ratio_dict[seqID])/maxRatio, float(ratio_dict[seqID])/wtRatio] + [poisson, bf, fdr, count_A_dict[seqID], count_B_dict[seqID] ]))
             
         if input_dict[seqID][2] == '2':
-            print >>f_2, '\t'.join([seqID] + map(str, input_dict[seqID][:6] + [math.log(float(ratio_dict[seqID]),2), float(ratio_dict[seqID])/maxRatio, float(ratio_dict[seqID])/wtRatio] + [poisson, bf, fdr], count_A_dict[seqID], count_B_dict[seq_ID]))
+            print >>f_2, '\t'.join([seqID] + map(str, input_dict[seqID][:6] + [math.log(float(ratio_dict[seqID]),2), float(ratio_dict[seqID])/maxRatio, float(ratio_dict[seqID])/wtRatio] + [poisson, bf, fdr, count_A_dict[seqID], count_B_dict[seqID] ]))
             
     f.close()
     f_1.close()

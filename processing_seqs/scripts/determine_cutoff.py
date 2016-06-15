@@ -9,7 +9,7 @@ def read_counts(counts_filename):
     with open(counts_filename) as f:
         lines = f.read().splitlines()
     lines.pop(0)
-    lines_proc = { line.split()[1] : float(line.split()[8]) for line in lines if '*' not in line.split()[1] }
+    lines_proc = dict( (line.split()[1] , float(line.split()[8])) for line in lines if '*' not in line.split()[1] )
 
     return lines_proc
 
@@ -17,11 +17,11 @@ def read_ratios(ratios_filename):
     with open(ratios_filename) as f:
 	lines = f.read().splitlines()
     lines.pop(0)
-    lines_proc = { line.split()[1] : float(line.split()[7]) for line in lines if '*' not in line.split()[1] }
+    lines_proc = dict( (line.split()[1] , float(line.split()[7])) for line in lines if '*' not in line.split()[1] )
     return lines_proc
 
 def combine_counts_ratios(counts, ratios, low_cutoff, high_cutoff):
-    merged = { key : (counts[key],ratios[key]) for key in counts if key in ratios and counts[key] >= low_cutoff and counts[key] <= high_cutoff }
+    merged = dict( (key , (counts[key],ratios[key])) for key in counts if key in ratios and counts[key] >= low_cutoff and counts[key] <= high_cutoff )
     #merged = { key : (counts[key],ratios[key]) for key in counts if key in ratios }
     return merged
 

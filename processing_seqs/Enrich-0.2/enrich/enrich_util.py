@@ -40,13 +40,13 @@ def build_tally_dict(input_file):
 
     filt_tally_dict = {}
     filt_properties_dict = {}   
-
     #6/3/16 added this line
     for mutation_location, mutation_location_dict in tally_dict.items():
-	filt_tally_dict[mutation_location] = dict( (mutation_identity, tally ) for mutation_identity, tally in mutation_location_dict if tally >= 10 )
-	filt_properties_dict[mutation_location] = dict( (mutation_identity, val ) for mutation_identity, val in properties_dict[mutation_location] if mutation_identity in filt_tally_dict[mutation_location])
-
-    return filt_tally_dict, filt_properties_dict
+	filt_tally_dict[mutation_location] = dict( (mutation_identity, tally ) for mutation_identity, tally in mutation_location_dict.items() if tally >= 10 )
+	filt_properties_dict[mutation_location] = dict( (mutation_identity, val ) for mutation_identity, val in properties_dict[mutation_location].items() if mutation_identity in filt_tally_dict[mutation_location])
+    
+    #return filt_tally_dict, filt_properties_dict
+    return tally_dict, properties_dict
 
 def norm_count_dict(count_dict):
     '''define a function that normalizes the counts in a counts dictionary'''
@@ -57,10 +57,10 @@ def norm_count_dict(count_dict):
 
     norm_dict = {}
     total = 0
-    for seqID in filt_dict:
-        total += filt_dict[seqID]
-    for seqID in filt_dict:
-        norm_dict[seqID] = float(filt_dict[seqID])/total
+    for seqID in count_dict:
+        total += count_dict[seqID]
+    for seqID in count_dict:
+        norm_dict[seqID] = float(count_dict[seqID])/total
     return norm_dict
     
 

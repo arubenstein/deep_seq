@@ -24,8 +24,18 @@ do
      fi
 
      enrich_dir=$outpath'/'$bg'_'$sel_name  
+     template_enrich=$HOME'/git_repos/deep_seq/processing_seqs/enrich_template/input/enrich_default_config'
      enrich_def_config=$enrich_dir'/input/enrich_default_config'
+         
      enrich_new_config=$enrich_dir'/input/test'   
+
+     #check that hasn't been run already
+     ratios=( $enrich_dir'/'data/output/ratios* )
+
+     if [[ ${#ratios[@]} -eq 6 ]]
+     then
+         echo $bg'_'$sel_name" has already been run"
+     fi
 
      mkdir -p $enrich_dir'/'input/
      mkdir -p $enrich_dir'/'data/raw/
@@ -34,7 +44,7 @@ do
      mkdir -p $enrich_dir'/'log/
      mkdir -p $enrich_dir'/'plots/
 
-     cp -r $HOME'/git_repos/deep_seq/processing_seqs/enrich_template/input/enrich_default_config' $enrich_dir'/input/'
+     cp -r $template_enrich $enrich_dir'/input/'
 
      cp $enrich_def_config $enrich_new_config 
      

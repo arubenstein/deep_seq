@@ -28,7 +28,6 @@ def main(project_directory, input_file, grid = 'L'):
     try:
         #build a dictionary of the sequences observed and counts:
         tally_dict, properties_dict = enrich_util.build_tally_dict(project_directory + 'data/tmp/' + input_file)
-                
         #build a dictionary of the sequence codes and counts:
         count_dict = {}
         for mutation_location in sorted(tally_dict):
@@ -36,14 +35,13 @@ def main(project_directory, input_file, grid = 'L'):
                 seqID = mutation_location + '-' + mutation_identity
                 count_dict[seqID] = tally_dict[mutation_location][mutation_identity]
         seqIDs = enrich_util.valuesort(count_dict)
-        
         #build a dictionary of the normalized tally:
         norm_dict = enrich_util.norm_count_dict(count_dict)
-
-    except:
+    
+    except ValueError as e:
         print 'Error: could not build dictionary of counts from input file'
-        return(1)
-        
+        #return(1)
+        raise e
     try:
         #print sequences and counts:
         f = open(project_directory + 'data/output/' + 'counts_' + input_file,'w')
