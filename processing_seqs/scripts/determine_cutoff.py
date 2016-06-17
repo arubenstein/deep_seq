@@ -40,6 +40,21 @@ def combine_counts_ratios(counts, ratios, low_cutoff, high_cutoff):
     #merged = { key : (counts[key],ratios[key]) for key in counts if key in ratios }
     return merged
 
+def combine_counts_ratios_mean(counts, ratios, low_cutoff, high_cutoff):
+    merged = dict( (key , (counts[key],ratios[key])) for key in counts if key in ratios and counts[key] >= low_cutoff and counts[key] <= high_cutoff )
+    #merged = { key : (counts[key],ratios[key]) for key in counts if key in ratios }
+    return merged
+
+def combine_counts_ratios_median(counts, ratios, low_cutoff, high_cutoff):
+    merged = dict( (key , (counts[key],ratios[key])) for key in counts if key in ratios and counts[key] >= low_cutoff and counts[key] <= high_cutoff )
+    dict_by_count = dict( (counts, dict(key, ratios) for key, (counts, ratios) in merged.items())
+
+    for counts, (key, ratios
+    
+
+    #merged = { key : (counts[key],ratios[key]) for key in counts if key in ratios }
+    return merged
+
 def find_coeff_pval(merged, ax, title):
 
     c_list = [ c for k,(c,r) in sorted(merged.items()) ]
