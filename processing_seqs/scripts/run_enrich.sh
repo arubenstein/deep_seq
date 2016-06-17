@@ -10,15 +10,18 @@ export PYTHONPATH="${PYTHONPATH}:/home/arubenstein/dist-packages"
 
 background=( $( < $ENRICH_BG_LIST ) )
 
-echo ${background[@]}
-
-for bg in "${background[@]}"
+for bg_full in "${background[@]}"
 do
+
+     IFS=',' read -ra sep <<< "$bg_full"
+     bg=${sep[0]}
+     supposed_sel=${sep[1]}
+
      bg_file=$OUTPATH'/'pre_enrich'/'$bg'_cut.fastq'
      length=$(( ${#actual_fn} - 4 ))
      sel_name=${actual_fn:0:$length}
 
-     if [[ $bg == $sel_name ]]
+     if [[ $supposed_sel != $sel_name ]]
      then
 	continue
      fi
