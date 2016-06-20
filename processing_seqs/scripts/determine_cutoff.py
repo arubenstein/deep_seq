@@ -7,6 +7,7 @@ import sys
 import argparse
 from plot import conv
 from plot import scatterplot
+import numpy as np
 
 def read_files(counts_filename, ratios_filename):
     if counts_filename is not None:
@@ -35,15 +36,35 @@ def read_ratios(ratios_filename, inc_counts=False):
         c_unsel = None
     return r, c_unsel
 
-def combine_counts_ratios(counts, ratios, low_cutoff, high_cutoff):
+def combine_counts_ratios(counts, ratios, low_cutoff, high_cutoff, st=""):
     merged = dict( (key , (counts[key],ratios[key])) for key in counts if key in ratios and counts[key] >= low_cutoff and counts[key] <= high_cutoff )
     #merged = { key : (counts[key],ratios[key]) for key in counts if key in ratios }
-    return merged
+    if st == "":
+        new_merged = [ (c,r) for key, (c,r) in merged.items() ]
+    elif st == "median" or st == "mean":
+        dict_mean = {}
+        new_merged = []
+
+        for key, (counts, ratios) in merged.items():
+            if dict_mean.get(counts) is None:
+                dict_mean[counts] = []
+            dict_mean[counts].append(ratios)
+
+        if st == "mean":
+            for counts, list_ratios in dict_mean.items():
+                new_merged.append( (counts, np.mean(list_ratios) ))
+    	else:
+            for counts, list_ratios in dict_mean.items():
+                new_merged.append( (counts, np.median(list_ratios) ))
+    else:
+	raise ValueError()
+
+    return new_merged
 
 def find_coeff_pval(merged, ax, title):
 
-    c_list = [ c for k,(c,r) in sorted(merged.items()) ]
-    r_list = [ r for k,(c,r) in sorted(merged.items()) ]
+    c_list = [ c for c,r in merged ]
+    r_list = [ r for c,r in merged ]
 
     scatterplot.draw_actual_plot(ax, c_list, r_list, 'k', title, "Counts", "Ratios")
     #scatterplot.plot_regression(ax, c_list, r_list, fit=True, neg=True)
@@ -57,15 +78,37 @@ def plot_coeff_pval(ax, counters, coeffs, pvals, title=""):
     scatterplot.draw_actual_plot(ax, counters, coeffs, 'b', title, "Counts", "PCC")
     blank,sec_ax = scatterplot.draw_actual_plot(ax, counters, pvals, 'r', title, "Counts", "Pvals", secondary_y=True)
     conv.add_hor_line(sec_ax, y=0.05, color='r')
-    cutoff = [ counter for pval, counter in zip(pvals, counters) if pval > 0.05 ][0]
-    conv.add_ver_line(ax, x=cutoff, color='r')
+    cutoff = [ counter for pval, counter in zip(pvals, counters) if pval > 0.05 ]
+    if len(cutoff) > 0:
+        conv.add_ver_line(ax, x=cutoff[0], color='r')
 
     conv.add_hor_line(ax, y=-0.1, color='b')
-    cutoff = [ counter for coeff, counter in zip(coeffs, counters) if coeff > -0.1 ][0]
-    conv.add_ver_line(ax, x=cutoff, color='b')
+    cutoff = [ counter for coeff, counter in zip(coeffs, counters) if coeff > -0.1 ]
+    if len(cutoff) > 0:
+        conv.add_ver_line(ax, x=cutoff[0], color='b')
+
+def gen_plots(c, r, ax2, output_pre, dirname, st=""):
+    fig, axarr = conv.create_ax(1, 31, shx=True, shy=True)
+
+    counters = []
+    coeffs = []
+    pvals = []
+    for i in xrange(1,31):
+        m = combine_counts_ratios(c, r, i, i+9, st=st)
+        coeff, pval = find_coeff_pval(m, axarr[i-1,0], "Sliding Window: {0} to {1}".format(i, i+9) )
+        print i, coeff, pval
+        counters.append(i)
+        coeffs.append(coeff)
+        pvals.append(pval)
+
+    plot_coeff_pval(axarr[30,0], counters, coeffs, pvals)
+    suffix = os.path.normpath(dirname).split(os.sep)[-3]
+    conv.save_fig(fig, output_pre + "correlation_plot.txt", "{0}_{1}".format(suffix,st), 4, 20*4)
+
+    plot_coeff_pval(ax2, counters, coeffs, pvals, suffix)
 
 def process_dir(dirnames, unsel, output_pre):
-    fig_all, axarr_all = conv.create_ax(len(dirnames), 1, shx=True, shy=True)
+    fig_all, axarr_all = conv.create_ax(len(dirnames), 3, shx=True, shy=True)
     for ind,dirname in enumerate(dirnames):
         print dirname
         counts_fn = dirname + '/counts_' + unsel + '*_PRO_qc'
@@ -80,27 +123,11 @@ def process_dir(dirnames, unsel, output_pre):
         
         c,r = read_files(c_fn, r_fn)
         
-        fig, axarr = conv.create_ax(1, 31, shx=True, shy=True)
+        gen_plots(c, r, axarr_all[0,ind], output_pre, dirname, st="")
+        gen_plots(c, r, axarr_all[1,ind], output_pre, dirname, st="mean")
+        gen_plots(c, r, axarr_all[2,ind], output_pre, dirname, st="median")
 
-        counters = []
-        coeffs = []
-        pvals = []
-
-        for i in xrange(1,31):
-            m = combine_counts_ratios(c, r, i, i+9)
-            coeff, pval = find_coeff_pval(m, axarr[i-1,0], "Sliding Window: {0} to {1}".format(i, i+9) ) 
-            print i, coeff, pval
-            counters.append(i)
-            coeffs.append(coeff)
-            pvals.append(pval)
-        
-        plot_coeff_pval(axarr[30,0], counters, coeffs, pvals)
-        suffix = os.path.normpath(dirname).split(os.sep)[-3] 
-        conv.save_fig(fig, output_pre + "/correlation_plot.txt", suffix, 4, 20*4)
-
-        plot_coeff_pval(axarr_all[0,ind], counters, coeffs, pvals, suffix)
-
-    conv.save_fig(fig_all, output_pre + "/all_coeff_pval.txt", "", 4*len(dirnames), 4)
+    conv.save_fig(fig_all, output_pre + "all_coeff_pval.txt", "", 4*len(dirnames), 12)
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description=__doc__)
