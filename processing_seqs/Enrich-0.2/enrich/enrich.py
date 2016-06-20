@@ -514,8 +514,8 @@ def counts(cfg_data_flattened, args=[]):
     
     if cfg_data_flattened['local'] == 'L':
         if cfg_data_flattened['input_read1_filename'] != 'NONE' or cfg_data_flattened['input_read2_filename'] != 'NONE':
-            retcodes.append(map_counts.main(cfg_data_flattened['path'], input_files[0], cfg_data_flattened['local'])) #call map_counts
-            retcodes.append(map_counts.main(cfg_data_flattened['path'], input_files[1], cfg_data_flattened['local'])) #call map_counts
+            retcodes.append(map_counts.main(cfg_data_flattened['path'], input_files[0], cfg_data_flattened['local'], filter=True)) #call map_counts
+            retcodes.append(map_counts.main(cfg_data_flattened['path'], input_files[1], cfg_data_flattened['local'], filter=True)) #call map_counts
         
         if cfg_data_flattened['sel_read1_filename'] != 'NONE' or cfg_data_flattened['sel_read2_filename'] != 'NONE':
             retcodes.append(map_counts.main(cfg_data_flattened['path'], sel_files[0], cfg_data_flattened['local'])) #call map_counts

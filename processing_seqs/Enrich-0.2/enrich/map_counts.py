@@ -14,7 +14,7 @@ __version__ = "0.2"
 __maintainer__ = "Douglas M. Fowler"
 __email__ = "dfowler@uw.edu"
 
-def main(project_directory, input_file, grid = 'L'):
+def main(project_directory, input_file, grid = 'L',filter = False):
 
     if grid != 'L': #print logging information, if being called from the cluster
         print time.asctime(time.localtime())
@@ -27,7 +27,7 @@ def main(project_directory, input_file, grid = 'L'):
     
     try:
         #build a dictionary of the sequences observed and counts:
-        tally_dict, properties_dict = enrich_util.build_tally_dict(project_directory + 'data/tmp/' + input_file)
+        tally_dict, properties_dict = enrich_util.build_tally_dict(project_directory + 'data/tmp/' + input_file, filter=filter)
         #build a dictionary of the sequence codes and counts:
         count_dict = {}
         for mutation_location in sorted(tally_dict):
