@@ -31,7 +31,7 @@ def read_ratios(ratios_filename, inc_counts=False):
     lines.pop(0)
     r = dict( (line.split()[1] , float(line.split()[7])) for line in lines if '*' not in line.split()[1] )
     if inc_counts:
-        c_unsel = dict( (line.split()[1], float(line.split()[-1])) for line in lines if '*' not in line.split()[1] )
+        c_unsel = dict( (line.split()[1], float(line.split()[-2])) for line in lines if '*' not in line.split()[1] )
     else:
         c_unsel = None
     return r, c_unsel
@@ -86,6 +86,17 @@ def plot_coeff_pval(ax, counters, coeffs, pvals, title=""):
     cutoff = [ counter for coeff, counter in zip(coeffs, counters) if coeff > -0.1 ]
     if len(cutoff) > 0:
         conv.add_ver_line(ax, x=cutoff[0], color='b')
+
+    #plot coeff cutoff based on derivative becoming <0.01 for 10 successive points
+    dy = np.diff(coeffs)
+    cutoff = -1
+    for i in xrange(0,len(dy)-5):
+        if all( abs(dy[y]) < 0.01 for y in xrange(i, i+5)):
+            cutoff = counters[i]
+            break 
+    if cutoff > -1:
+        conv.add_ver_line(ax, x=cutoff+1, color='g')
+
 
 def gen_plots(c, r, ax2, output_pre, dirname, st=""):
     fig, axarr = conv.create_ax(1, 31, shx=True, shy=True)
