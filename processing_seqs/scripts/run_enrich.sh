@@ -4,6 +4,7 @@ file=$1
 actual_fn=$2
 outpath=$3
 server=$4
+threshold=$5
 
 export PATH="${PATH}:/home/arubenstein/dist-packages"
 export PYTHONPATH="${PYTHONPATH}:/home/arubenstein/dist-packages"
@@ -38,6 +39,7 @@ do
      if [[ ${#ratios[@]} -eq 6 ]]
      then
          echo $bg'_'$sel_name" has already been run"
+         continue
      fi
 
      mkdir -p $enrich_dir'/'input/
@@ -51,16 +53,16 @@ do
 
      cp $enrich_def_config $enrich_new_config 
      
-     cp $bg_file $enrich_dir'/data/raw/'$bg.fastq
-     cp $file $enrich_dir'/data/raw/'$sel_name.fastq
+     ln -s $bg_file $enrich_dir'/data/raw/'$bg.fastq
+     ln -s $file $enrich_dir'/data/raw/'$sel_name.fastq
 
      #change name of sel and unsel files
      sed -i 's/dummy1/'$bg'/g' $enrich_new_config
      sed -i 's/dummy2/'$sel_name'/g' $enrich_new_config
 
      #change name of path in config file
-     sed -i 's/enrich_template/'$bg'_'$sel_name'/g' $enrich_new_config
-
+     sed -i 's:PATH_REP:'$outpath'/'$bg'_'$sel_name'/:g' $enrich_new_config
+     sed -i 's:COUNTS_THRESHOLD:'$threshold':g' $enrich_new_config
      sed -i 's/dummy_run_name/'$bg'_'$sel_name'/g' $enrich_new_config
 
      enrich --mode read_fuse --config_file $enrich_new_config
@@ -68,6 +70,6 @@ do
      enrich --mode map_counts --config_file $enrich_new_config
      enrich --mode map_ratios --config_file $enrich_new_config
      #enrich --mode map_unlink --config_file $enrich_new_config
-
+     rm $enrich_dir'/data/tmp/'*
 done
 

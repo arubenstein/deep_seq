@@ -55,13 +55,13 @@ def main(path, read1, read2, paired_mismatch_threshold, read1_overlap_start, rea
 
     if grid == 'L':
         #open the files
-        try:
-            f_read1 = open((path + read1), 'U')
+        #try:
+        f_read1 = open((path + read1), 'U')
         
-        except:
-            if mode == 'B' or mode == 'R1':
-                print 'Error: Read 1 input file not found'
-                return 1
+        #except:
+        #    if mode == 'B' or mode == 'R1':
+        #        print 'Error: Read 1 input file not found'
+        #        return 1
         
         try:
             f_read2 = open((path + read2), 'U') 

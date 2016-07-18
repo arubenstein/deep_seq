@@ -245,6 +245,7 @@ def main(mode, project_directory = ''):
     
     section_config['input_filename_map_counts'] = ','.join([config['input_filename_aligner'] + '_PRO_qc', config['input_filename_aligner'] + '_DNA_qc'])
     section_config['sel_filename_map_counts'] = ','.join([config['sel_filename_aligner'] + '_PRO_qc', config['sel_filename_aligner'] + '_DNA_qc'])
+    section_config['counts_threshold'] = ainput('Number of counts to threshold on: ', 1, existing_cfg[section_name]['counts_threshold']).getInteger()
 
     enrich_config_write(f_output, section_config, 'map_counts')
     config.update(section_config) #add the values from this section to the master dictionary

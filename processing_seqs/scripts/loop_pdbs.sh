@@ -6,7 +6,7 @@ script=$3
 server=$4
 n_servers=$5
 n_cores_per_script=$6
-
+threshold=$7
 
 input=($regex_files)
 
@@ -30,7 +30,7 @@ echo "Filenames are ${input[@]:$begin_index:$n_files_in_group}"
 #sets counters
 counter=0
 
-n_cores=30
+n_cores=40
 
 #n_cores_per_script must be a factor of n_cores TODO: output warning if not
 if [ ! -z ${n_cores_per_script+x} ];
@@ -49,7 +49,7 @@ do
 
 	echo "Actual filename is $actual_fn"
 
-	$script $file $actual_fn $outpath $server &
+	$script $file $actual_fn $outpath $server $threshold &
 
         if (( $counter % $n_cores == 0 ));
              then
