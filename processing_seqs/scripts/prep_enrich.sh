@@ -29,3 +29,5 @@ echo "Initial: $beg_n_seq sequences"
 echo "Final: $end_n_seq sequences"
 echo "No Align: $nomatch_n_seq sequences"
 echo "Dummy: $dummy_n_seq sequences"
+
+rm $actual_fn'_cut.fasta'

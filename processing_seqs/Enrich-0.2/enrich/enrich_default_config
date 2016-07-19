@@ -47,6 +47,7 @@
 <map_counts section="TRUE">
 <input_filename_map_counts>input_read1_index_filtered_B_PRO_qc,input_read1_index_filtered_B_DNA_qc</input_filename_map_counts>
 <sel_filename_map_counts>sel_read1_index_filtered_B_PRO_qc,sel_read1_index_filtered_B_DNA_qc</sel_filename_map_counts>
+<counts_threshold>1</counts_threshold>
 </map_counts>
 <map_ratios section="TRUE">
 <input_filename_map_ratios>counts_input_read1_index_filtered_B_PRO_qc,counts_input_read1_index_filtered_B_DNA_qc</input_filename_map_ratios>
