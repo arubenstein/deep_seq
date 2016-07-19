@@ -1,0 +1,23 @@
+<dock_design>
+      <SCOREFXNS>
+	<myscore weights=talaris2014.wts/>
+      </SCOREFXNS>
+      <TASKOPERATIONS>
+         <InitializeFromCommandline name=init/>
+         <ReadResfile name=rrf/>
+      </TASKOPERATIONS>
+
+      <FILTERS>
+      </FILTERS>
+
+      <MOVERS>
+        <PackRotamersMover name=repack task_operations=rrf/>
+
+</MOVERS>
+<APPLY_TO_POSE>
+</APPLY_TO_POSE>
+
+      <PROTOCOLS>
+              <Add mover_name=repack/>
+      </PROTOCOLS>
+</dock_design>
