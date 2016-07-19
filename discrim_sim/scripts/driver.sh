@@ -1,5 +1,8 @@
 #!/bin/bash
 
+prelim=$1
+prefix=$2
+
 export HOME=~/
 export OUTPATH=~/git_repos/deep_seq/discrim_sim/results/
 export INPATH=~/git_repos/deep_seq/discrim_sim/input/
@@ -16,4 +19,4 @@ then
 	mv 2fm2_complex_0001.pdb ly104.pdb
 fi
 
-nohup nice $ROSETTA_BIN'/'discrim_sim.linuxgccrelease -database $ROSETTA_DB -s ~/mean_field/relax_decoys/ly104_no_optH/Job_1/Job_1ly104_0001.pdb -enzdes::cstfile /home/arubenstein/git_repos/deep_seq/discrim_sim/input/pdbs/ly104cstfile.txt -run:preserve_header @/home/arubenstein/git_repos/general_src/enzflags > sim.log
+nohup nice $ROSETTA_BIN'/'discrim_sim.static.linuxgccrelease -database $ROSETTA_DB -s $INPATH'/'pdbs/Job_20ly104_0032.pdb -enzdes::cstfile $INPATH'/'pdbs/ly104cstfile.txt -run:preserve_header @/home/arubenstein/git_repos/general_src/enzflags -out::prefix $prefix -resfile $INPATH'/'resfile/rfpackpept.txt > sim.log
