@@ -6,6 +6,8 @@ import argparse
 import itertools
 import math
 from subprocess import Popen
+import glob
+from shutil import copy 
 
 OUTPATH="/home/arubenstein/git_repos/deep_seq/discrim_sim/results/"
 INPATH="/home/arubenstein/git_repos/deep_seq/discrim_sim/input/"
@@ -71,8 +73,8 @@ def main(server_num, queue_type, fen2, seqfile):
                 fragfiles = ""
 	        #if this was already run 
 	        #test that ? works as expected
-	        if len(glob.glob("{outpath}{prefix}/{prefix}??.pdb".format)) == 400:
-                    continue
+	        if len(glob.glob("{outpath}{prefix}/{prefix}??.pdb".format(outpath=OUTPATH, prefix=prefix))) == 400:
+		    continue
 	    else:
                 prefix = "{list_fn}_{c}".format(list_fn=os.path.split(os.path.splitext(seqfile)[0])[1], c=counter)
                 list_name = "{outpath}/{p}/{p}.list".format( outpath=OUTPATH, p=prefix )
@@ -94,8 +96,13 @@ def main(server_num, queue_type, fen2, seqfile):
                             pass
 		    out.writelines('%s\n' % (i) for i in item)
 
+            if queue_type == "bash":
+                rbin = OUTPATH + prefix
+            else:
+                rbin = ROSETTA_BIN
+
 	    #generic command
-            command = "{bin}/discrim_sim.static.linuxgccrelease -database {db} -s {inpath}/pdbs/Job_20ly104_0032.pdb -out::path::pdb {outpath}/{prefix}/ -enzdes::cstfile {inpath}/pdbs/ly104cstfile.txt -run:preserve_header @/home/arubenstein/git_repos/general_src/enzflags -out::prefix {prefix} -resfile {inpath}/resfile/rfpackpept.txt {f}".format( bin=ROSETTA_BIN, db=ROSETTA_DB, outpath=OUTPATH, inpath=INPATH, prefix=prefix, f=fragfiles )
+            command = "{bin}/discrim_sim.static.linuxgccrelease -database {db} -s {inpath}/pdbs/Job_20ly104_0032.pdb -out::path::pdb {outpath}/{prefix}/ -enzdes::cstfile {inpath}/pdbs/ly104cstfile.txt -run:preserve_header @/home/arubenstein/git_repos/general_src/enzflags -out::prefix {prefix} -resfile {inpath}/resfile/rfpackpept.txt {f}".format( bin=rbin, db=ROSETTA_DB, outpath=OUTPATH, inpath=INPATH, prefix=prefix, f=fragfiles )
 	    
 	    #if slurm style, write script and run as a batch script
             if queue_type != "bash":
@@ -124,6 +131,7 @@ def main(server_num, queue_type, fen2, seqfile):
 
 	    #if bash style, run as a process and wait at the end
 	    else:
+		copy("{rb}/discrim_sim.static.linuxgccrelease".format(rb=ROSETTA_BIN), "{rb}/discrim_sim.static.linuxgccrelease".format(rb=rbin))
 	        with open(OUTPATH + prefix + '/' + prefix + ".log", 'w') as file_out:
             	    p = Popen("nohup nice " + command, stdout=file_out, shell=True)
                 ps.append(p)
