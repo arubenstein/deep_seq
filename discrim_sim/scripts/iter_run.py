@@ -34,7 +34,7 @@ def main(server_num, queue_type, fen2, seqfile):
     counter = 0
  
     if queue_type == "torque":
-        interval = 450
+        interval = 450 
         wait = False
         ncores = 1000
         script_suff = "qsub"
