@@ -37,8 +37,9 @@ def main(list_sequence_names, hamming_dist, output_prefix):
         fit_lower = fit1 if dist_seq1 < dist_seq2 else fit2
         fit_upper = fit2 if dist_seq1 < dist_seq2 else fit1
         fit_upper = fit_upper if fit_upper > 0 else 0.001
-        
-        edges_out.write("{0},{1},{2}\n".format(seq1,seq2,fit_lower/float(fit_upper))) #does this have the correct directionality?
+        seq_lower = seq1 if dist_seq1 < dist_seq2 else seq2
+        seq_upper = seq2 if dist_seq1 < dist_seq2 else seq1        
+        edges_out.write("{0},{1},{2}\n".format(seq_lower,seq_upper,fit_lower/float(fit_upper))) #does this have the correct directionality?
 
     already_written_nodes = []
    

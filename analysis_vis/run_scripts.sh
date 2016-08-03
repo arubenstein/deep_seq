@@ -4,3 +4,7 @@ python CreateEdges.py --sequence_list ~/git_repos/deep_seq/analysis_vis/seq_list
 
 python FractionFuncPerMutant.py --sequence_list ~/git_repos/deep_seq/analysis_vis/seq_lists/WT_nextseq_cleaved.txt "CLEAVED" --sequence_list ~/git_repos/deep_seq/analysis_vis/seq_lists/WT_nextseq_uncleaved.txt "UNCLEAVED" --sequence_list ~/git_repos/deep_seq/analysis_vis/seq_lists/WT_nextseq_middle.txt "MIDDLE" --output_prefix ~/git_repos/deep_seq/analysis_vis/results/WT_nextseq_cleaved_v_uncleaved --func_labels "CLEAVED" --unfunc_labels "UNCLEAVED" --canonical "DEMEE" 
 
+python FractionFuncPerMutant.py --sequence_list ~/git_repos/deep_seq/analysis_vis/seq_lists/WT_nextseq_cleaved.txt "CLEAVED" --sequence_list ~/git_repos/deep_seq/analysis_vis/seq_lists/WT_nextseq_uncleaved.txt "UNCLEAVED" --sequence_list ~/git_repos/deep_seq/analysis_vis/seq_lists/WT_nextseq_middle.txt "MIDDLE" --output_prefix ~/git_repos/deep_seq/analysis_vis/results/WT_nextseq_cleaved_v_uncleaved_middle --func_labels "CLEAVED" --unfunc_labels "UNCLEAVED" "MIDDLE" --canonical "DEMEE"
+
+python FractionFuncPerMutant.py --sequence_list ~/git_repos/deep_seq/analysis_vis/seq_lists/WT_nextseq_cleaved.txt "CLEAVED" --sequence_list ~/git_repos/deep_seq/analysis_vis/seq_lists/WT_nextseq_uncleaved.txt "UNCLEAVED" --sequence_list ~/git_repos/deep_seq/analysis_vis/seq_lists/WT_nextseq_middle.txt "MIDDLE" --output_prefix ~/git_repos/deep_seq/analysis_vis/results/WT_nextseq_cleaved_middle_v_uncleaved --func_labels "CLEAVED" "MIDDLE" --unfunc_labels "UNCLEAVED" --canonical "DEMEE"
+
