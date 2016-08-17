@@ -11,12 +11,12 @@ from subprocess import Popen
 import glob
 from shutil import copy 
 
-OUTPATH="/home/arubenstein/git_repos/deep_seq/discrim_sim/results/"
-INPATH="/home/arubenstein/git_repos/deep_seq/discrim_sim/input/"
-SCRIPTS="/home/arubenstein/git_repos/deep_seq/discrim_sim/scripts/"
-ROSETTA_BIN="/home/arubenstein/Rosetta/main/source/bin/"
-ROSETTA_DB="/home/arubenstein/Rosetta/main/database/"
-XML="/home/arubenstein/git_repos/deep_seq/discrim_sim/xml/"
+OUTPATH="/scratch/alizarub/git_repos/deep_seq/discrim_sim/results/"
+INPATH="/home/alizarub/git_repos/deep_seq/discrim_sim/input/"
+SCRIPTS="/home/alizarub/git_repos/deep_seq/discrim_sim/scripts/"
+ROSETTA_BIN="/home/alizarub/Rosetta/main/source/bin/"
+ROSETTA_DB="/home/alizarub/Rosetta/main/database/"
+XML="/home/alizarub/git_repos/deep_seq/discrim_sim/xml/"
 
 def main(server_num, queue_type, fen2, seqfile):
 
@@ -42,6 +42,7 @@ def main(server_num, queue_type, fen2, seqfile):
         script_suff = "qsub"
         a_or_w = 'a'
         background = "&"
+        home="/home/arubenstein/"
     elif queue_type == "slurm":
         interval = 1000
 	wait = False
@@ -49,10 +50,12 @@ def main(server_num, queue_type, fen2, seqfile):
         script_suff = "sbatch"
         a_or_w = 'w'
         background = ""
+	home="/home/alizarub/"
     else:
 	interval = math.ceil(8000/14.0) #this is the number of jobs that this script should kick off in total
     	wait = True
         ncores = 58
+	home="/home/arubenstein/"
 
     ps = []    
 
@@ -84,6 +87,8 @@ def main(server_num, queue_type, fen2, seqfile):
 	    
             try:
 	        os.mkdir(OUTPATH + prefix)
+                copy("{db}/scoring/weights/talaris2014.wts".format(db=ROSETTA_DB), os.path.join(OUTPATH,prefix,"talaris2014.wts"))
+                copy("{db}/scoring/weights/talaris2014_cst.wts".format(db=ROSETTA_DB), os.path.join(OUTPATH,prefix,"talaris2014_cst.wts"))
 	    except: 
 	        pass
 
@@ -94,6 +99,8 @@ def main(server_num, queue_type, fen2, seqfile):
 		    for i in item:
 		        try:
 			    os.mkdir(OUTPATH + i[0:3])
+			    copy("{db}/scoring/weights/talaris2014.wts"(db=ROSETTA_DB), os.path.join(OUTPATH,i[0:3],"talaris2014.wts"))
+                            copy("{db}/scoring/weights/talaris2014_cst.wts"(db=ROSETTA_DB), os.path.join(OUTPATH,i[0:3],"talaris2014_cst.wts"))
                         except:
                             pass
 		    out.writelines('%s\n' % (i) for i in item)
@@ -104,7 +111,7 @@ def main(server_num, queue_type, fen2, seqfile):
                 rbin = ROSETTA_BIN
 
 	    #generic command
-            command = "{s}/rosetta_amber_seq.sh {bin} {db} {inpath} {outpath} {p}"format( bin=rbin, db=ROSETTA_DB, outpath=OUTPATH, inpath=INPATH, p=prefix, f=fragfiles )
+            command = "{s}/rosetta_amber_seq.sh {bin} {db} {inpath} {outpath} {p} {home} {s}".format( bin=rbin, db=ROSETTA_DB, outpath=OUTPATH, inpath=INPATH, p=prefix, f=fragfiles, s=SCRIPTS, home=home )
 	    
 	    #if slurm style, write script and run as a batch script
             if queue_type != "bash":

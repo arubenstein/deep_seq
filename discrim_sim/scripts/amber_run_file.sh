@@ -3,13 +3,15 @@
 
 inp_pdb=$1
 path=$2
+scripts=$3
+torque=$4
 
 full_pdb_path=$path'/'$inp_pdb'.pdb'
 outpath=$path'/'$inp_pdb'/'
 
 mkdir -p $path'/'$inp_pdb
 
-perl $SCRIPTS'/modify2.pl' $full_pdb_path > $outpath'/'$inp_pdb'.pdb'
+perl $scripts'/modify2.pl' $full_pdb_path > $outpath'/'$inp_pdb'.pdb'
 
 cd $outpath
 #6.131s real
@@ -26,14 +28,20 @@ quit
 EOF
 tleap -f tleap.in
 
+if [[ $torque -eq 1 ]]
+then
+	script_pre=$scripts'/'
+else
+	script_pre=""
+
 #3.901s real
-$SCRIPTS'/'ante-MMPBSA.py -p $inp_pdb.prmtop -c $inp_pdb'_c.prmtop' -s @Cl-
+$script_preante-MMPBSA.py -p $inp_pdb.prmtop -c $inp_pdb'_c.prmtop' -s @Cl-
 #5.350s real
-$SCRIPTS'/'ante-MMPBSA.py -p $inp_pdb'_c.prmtop' -r $inp_pdb'_r.prmtop' -l $inp_pdb'_l.prmtop' -n :197-206
+$script_preante-MMPBSA.py -p $inp_pdb'_c.prmtop' -r $inp_pdb'_r.prmtop' -l $inp_pdb'_l.prmtop' -n :197-206
 
 
 #26.889s real
-$SCRIPTS'/'MMPBSA.py -O -i $SCRIPTS'/'mmpbsa.in -o $inp_pdb'_FINAL_RESULTS_MMPBSA.dat' -sp $inp_pdb.prmtop -cp $inp_pdb'_c.prmtop' -rp $inp_pdb'_r.prmtop' -lp $inp_pdb'_l.prmtop' -y *.inpcrd > progress.log 2>&1 
+$scripts_preMMPBSA.py -O -i $scripts'/'mmpbsa.in -o $inp_pdb'_FINAL_RESULTS_MMPBSA.dat' -sp $inp_pdb.prmtop -cp $inp_pdb'_c.prmtop' -rp $inp_pdb'_r.prmtop' -lp $inp_pdb'_l.prmtop' -y *.inpcrd > progress.log 2>&1 
 
 grep " 198," FINAL_DECOMP_MMPBSA.dat > log1
 grep " 199," FINAL_DECOMP_MMPBSA.dat > log2
@@ -48,8 +56,8 @@ cat log1 log2 log3 log4 log5 log6 log7 log8 > dat
 awk 'NR%2==1' dat > dat_complex
 awk 'NR%2==o' dat > dat_binding
 
-perl $SCRIPTS'/'mean_complex.pl dat_complex > temp_complex 
-perl $SCRIPTS'/'mean_binding.pl dat_binding > temp_binding
+perl $scripts'/'mean_complex.pl dat_complex > temp_complex 
+perl $scripts'/'mean_binding.pl dat_binding > temp_binding
 
 rm dat*
 rm log*
