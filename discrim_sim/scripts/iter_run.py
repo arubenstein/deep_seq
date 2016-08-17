@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+'''WARNING - fragfile/seqfile may not work as expected since changing the location of silent file in the discrim_sim app'''
+
 import os
 import sys
 import argparse
@@ -73,7 +75,7 @@ def main(server_num, queue_type, fen2, seqfile):
                 fragfiles = ""
 	        #if this was already run 
 	        #test that ? works as expected
-	        if len(glob.glob("{outpath}{prefix}/{prefix}??.pdb".format(outpath=OUTPATH, prefix=prefix))) == 400:
+	        if len(glob.glob("{outpath}{prefix}/{prefix}*_dat_complex".format(outpath=OUTPATH, prefix=prefix))) == 400:
 		    continue
 	    else:
                 prefix = "{list_fn}_{c}".format(list_fn=os.path.split(os.path.splitext(seqfile)[0])[1], c=counter)
@@ -102,13 +104,13 @@ def main(server_num, queue_type, fen2, seqfile):
                 rbin = ROSETTA_BIN
 
 	    #generic command
-            command = "{bin}/discrim_sim.static.linuxgccrelease -database {db} -s {inpath}/pdbs/Job_20ly104_0032.pdb -out::path::pdb {outpath}/{prefix}/ -enzdes::cstfile {inpath}/pdbs/ly104cstfile.txt -run:preserve_header @/home/arubenstein/git_repos/general_src/enzflags -out::prefix {prefix} -resfile {inpath}/resfile/rfpackpept.txt {f}".format( bin=rbin, db=ROSETTA_DB, outpath=OUTPATH, inpath=INPATH, prefix=prefix, f=fragfiles )
+            command = "{s}/rosetta_amber_seq.sh {bin} {db} {inpath} {outpath} {p}"format( bin=rbin, db=ROSETTA_DB, outpath=OUTPATH, inpath=INPATH, p=prefix, f=fragfiles )
 	    
 	    #if slurm style, write script and run as a batch script
             if queue_type != "bash":
                 if queue_type == "slurm":
                     script_fn = OUTPATH + prefix + '/' + prefix + "." + script_suff
-                elif seqfile != "": #really should have a third option for tyr not seqfile
+                elif queue_type == "torque": #really should have a third option for tyr not seqfile
                     job_count=int(math.ceil(counter/30.0))
                     script_fn = "{o}{c}.{suff}".format(o=OUTPATH, c=job_count, suff=script_suff)
 
