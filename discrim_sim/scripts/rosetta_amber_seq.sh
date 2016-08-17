@@ -15,5 +15,10 @@ for pdb_name in $(ls *.pdb)
 do
 	pn=$(basename $pdb_name '.pdb')
 	$inpath'/scripts/amber_run_file.sh' $pn $outpath'/'$sequence
-        rm $pdb_name 
+	if [[ -f $pn'_dat_complex' ]]
+	then
+		rm $pdb_name 
+	else
+		echo "Warning - amber run did not complete and pdb file $pdb_name has not yet been deleted"
+	fi
 done
