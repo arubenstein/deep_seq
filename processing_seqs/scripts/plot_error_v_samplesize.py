@@ -84,16 +84,16 @@ def plot_curve(ax, x, y, label, title, x_axis, y_axis, norm=None):
 
     conv.annotate_point(ax, min_distance_point[2], min_distance_point[3], "({0:.2f},{1:.2f}) at: {2}".format(min_distance_point[2], min_distance_point[3], min_distance_point[1]))
 
-    dx = np.diff(norm_x)
-    threshold = -1
-    for i in xrange(0,len(dx)-3):
-        if all( abs(dx[ind]) < 0.01 for ind in xrange(i, i+3)):
-            x_val = x[i]
-            y_val = y[i]
-            threshold = i
-            break
-    if threshold > -1:
-        conv.annotate_point(ax, x_val, y_val, "({0:.2f},{1:.2f}) at: {2}".format(x_val, y_val, threshold))
+    #dx = np.diff(norm_x)
+    #threshold = -1
+    #for i in xrange(0,len(dx)-3):
+    #    if all( abs(dx[ind]) < 0.01 for ind in xrange(i, i+3)):
+    #        x_val = x[i]
+    #        y_val = y[i]
+    #        threshold = i
+    #        break
+    #if threshold > -1:
+    #    conv.annotate_point(ax, x_val, y_val, "({0:.2f},{1:.2f}) at: {2}".format(x_val, y_val, threshold))
 
 def process_dir(initial_dir, output_pre):
 
@@ -124,28 +124,30 @@ def process_dir(initial_dir, output_pre):
 
 
     #for each dirname, glob find all the directories within this dirname
-    for threshold in xrange(1,31):
+    for threshold in xrange(1,20):
         path_prefix = os.path.join(initial_dir,str(threshold))
         #todo: check that it exists
 
         for key in samplesize.keys():
-            ratios_fname = glob.glob(os.path.join(path_prefix, key, "data", "output", "ratios_*PRO_qc"))[0]
+            print key
+            print os.path.join(path_prefix, key, "data", "output", "avg_ratios_*DNA_qc")
+            ratios_fname = glob.glob(os.path.join(path_prefix, key, "data", "output", "avg_ratios_*DNA_qc"))[0]
             uniq_seq = file_len(ratios_fname)
-            ratios_fname = glob.glob(os.path.join(initial_dir, "1", key, "data", "output", "ratios_*PRO_qc"))[0]
+            ratios_fname = glob.glob(os.path.join(initial_dir, "1", key, "data", "output", "avg_ratios_*DNA_qc"))[0]
             tot_uniq_seq = file_len(ratios_fname)            
 
             samplesize[key].append(uniq_seq/float(tot_uniq_seq))
          
         #do the following for 3 pairs of 7-72 and so on
         for freq1, freq2 in freq_freq.keys():
-           freq1_filename = "counts_" + '_'.join(freq1.split("_")[2:]) + ".fast_R1_PRO_qc"
-           freq2_filename = "counts_" + '_'.join(freq2.split("_")[2:]) + ".fast_R1_PRO_qc"
+           freq1_filename = "counts_" + '_'.join(freq1.split("_")[2:]) + ".fast_R1_DNA_qc"
+           freq2_filename = "counts_" + '_'.join(freq2.split("_")[2:]) + ".fast_R1_DNA_qc"
            fr = calc_freq_ratio(os.path.join(path_prefix, freq1, "data", "output", freq1_filename), os.path.join(path_prefix, freq2, "data", "output", freq2_filename))
            freq_freq[(freq1,freq2)][0].append(fr)
 
         #collect the ratios for 7-72 - take their abs values and then find the 75th percentile
         for r_name in ratios.keys():
-            ratios_fname = glob.glob(os.path.join(path_prefix, r_name, "data", "output", "ratios_*PRO_qc"))[0]
+            ratios_fname = glob.glob(os.path.join(path_prefix, r_name, "data", "output", "avg_ratios_*DNA_qc"))[0]
             r, c_unsel, c_sel = read_ratios(ratios_fname)
             r_perc = np.percentile([abs(r_val) for key,r_val in r.items()], 75)
             ratios[r_name][0].append(r_perc)
@@ -160,7 +162,7 @@ def process_dir(initial_dir, output_pre):
     plot_dict(overlap_c_unc, samplesize, output_pre, "overlap_c_unc", "Overlap Between Cleaved and Uncleaved", norm="all")
     #plot_dict(freq_freq, samplesize, output_pre, "freq_freq", "abs(Freq-Freq)/Freq")
     #plot_dict(ratios, samplesize, output_pre, "ratios", "Enrich Ratio", norm="top")
-    plot_dict(ratios, samplesize, output_pre, "ratios", "Enrich Ratio", norm=None)
+    #plot_dict(ratios, samplesize, output_pre, "ratios", "Enrich Ratio", norm=None)
     plot_dict(ratios, samplesize, output_pre, "ratios", "Enrich Ratio", norm="all")
 
     for key, val in overlap_c_unc.items():
@@ -180,7 +182,7 @@ def plot_dict(dict_to_plot, samplesize, output_pre, suffix, x_axis, norm="all"):
         samplesize_list = [ l for k, l in samplesize.items() if k == sample_name ][0] #assume only one item meets that criteria
         title = ''.join(key)[0:28]
         plot_curve(axarr[0,ind], val, samplesize_list, "", title, x_axis, "Sample Size", norm=norm)
-    conv.save_fig(fig, output_pre + (norm if norm is not None else "none"), suffix, len(dict_to_plot)*4, 4, tight=True)
+    conv.save_fig(fig, output_pre + (norm if norm is not None else "none"), suffix, len(dict_to_plot)*4, 4, tight=True, size=10)
 
 if __name__ == "__main__":
 

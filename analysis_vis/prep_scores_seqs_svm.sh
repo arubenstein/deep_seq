@@ -5,6 +5,11 @@ path=~/git_repos/deep_seq/analysis_vis/seq_lists/
 for seq_list in $(ls $path*.txt)
 do
 
+    if [[ ! $seq_list =~ "WT_nextseq" ]]
+    then
+        continue
+    fi
+
     if [[ $seq_list =~ "uncleaved" ]]
     then
         label="UNCLEAVED"
@@ -21,8 +26,8 @@ do
     awk -F, '{print $1}' $path$base'_structure_features.csv' > $path$base'_seqs_data.list' 
     grep -f $path$base'_seqs_data.list' $path$base'_structure_features.csv' | awk -F, -v l=$label 'BEGIN{OFS=","}; {for (i=2; i<=NF; i++) printf $i","}{print l}' > $path$base'_struct.csv'
     grep -f $path$base'_seqs_data.list' $path$base'_sequence_features.csv' | awk -F, -v l=$label 'BEGIN{OFS=","}; {for (i=2; i<=NF; i++) printf $i","}{print l}'  > $path$base'_seq.csv'
-    awk -F, -v l=$label 'BEGIN{OFS=","}; {printf $1} {for ( i=2; i<NF; i++) printf ","$i} {printf "\n"}' $path$base'_seq.csv' > $path$base'_seq_nolabel.csv'
-    paste $path$base'_seq.csv' $path$base'_struct.csv' > $path$base'_structseq.csv'
+    awk -F, -v l=$label 'BEGIN{OFS=","}; {printf $1} {for ( i=2; i<NF; i++) printf ","$i} {printf ",\n"}' $path$base'_seq.csv' > $path$base'_seq_nolabel.csv'
+    paste $path$base'_seq_nolabel.csv' $path$base'_struct.csv' > $path$base'_structseq.csv'
      
 done
 
