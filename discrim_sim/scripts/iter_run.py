@@ -77,7 +77,7 @@ def main(server_num, queue_type, fen2, seqfile):
 	        prefix = item
                 fragfiles = ""
 	        #if this was already run 
-	        #test that ? works as expected
+	        #does not test that _dat_complex is not empty (or 0)
 	        if len(glob.glob("{outpath}{prefix}/{prefix}*_dat_complex".format(outpath=OUTPATH, prefix=prefix))) == 400:
 		    continue
 	    else:
@@ -123,9 +123,9 @@ def main(server_num, queue_type, fen2, seqfile):
 
 	        with open(script_fn, a_or_w) as script:
 		    if fen2 == "true":
-		        header = "#!/bin/bash\n#SBATCH -n 1\n#SBATCH -c 1\n#SBATCH --job-name={p}\n#SBATCH -p main\n#SBATCH --export=ALL\n#SBATCH -o {outpath}{p}/slurm{s}.out\n#SBATCH --time=30:00:00\n".format(p = prefix,outpath=OUTPATH)
+		        header = "#!/bin/bash\n#SBATCH -n 1\n#SBATCH -c 1\n#SBATCH --export=ALL\n#SBATCH --job-name={p}\n#SBATCH -p main\n#SBATCH --export=ALL\n#SBATCH -o {outpath}{p}/slurm{p}.out\n#SBATCH -t 60:00:00\n#SBATCH --mem=5500\n\n".format(p = prefix,outpath=OUTPATH)
 		    elif queue_type == "slurm":
-		        header = "#!/bin/bash\n#SBATCH -n 1\n#SBATCH -c 1\n#SBATCH --job-name={p}\n#SBATCH -o {outpath}{p}/slurm{p}.out\n\n".format(p = prefix, outpath=OUTPATH)
+		        header = "#!/bin/bash\n#SBATCH -n 1\n#SBATCH -c 1\n#SBATCH --export=ALL\n#SBATCH --job-name={p}\n#SBATCH -o {outpath}{p}/slurm{p}.out\n\n".format(p = prefix, outpath=OUTPATH)
                     elif queue_type == "torque": #is this true for tyr not seqfile?
 			header = "#!/bin/bash\n#PBS -l nodes=1\n#PBS -l walltime=24:00:00\n#PBS -q tyr\n#PBS -N {c}\n#PBS -o {outpath}/{c}.out\n#PBS -e {outpath}/{c}.err\n".format(c = job_count, outpath=OUTPATH)
 		    
