@@ -33,15 +33,16 @@ then
 	script_pre=$scripts'/'
 else
 	script_pre=""
+fi
 
 #3.901s real
-$script_preante-MMPBSA.py -p $inp_pdb.prmtop -c $inp_pdb'_c.prmtop' -s @Cl-
+$script_pre'ante-MMPBSA.py' -p $inp_pdb.prmtop -c $inp_pdb'_c.prmtop' -s @Cl-
 #5.350s real
-$script_preante-MMPBSA.py -p $inp_pdb'_c.prmtop' -r $inp_pdb'_r.prmtop' -l $inp_pdb'_l.prmtop' -n :197-206
+$script_pre'ante-MMPBSA.py' -p $inp_pdb'_c.prmtop' -r $inp_pdb'_r.prmtop' -l $inp_pdb'_l.prmtop' -n :197-206
 
 
 #26.889s real
-$scripts_preMMPBSA.py -O -i $scripts'/'mmpbsa.in -o $inp_pdb'_FINAL_RESULTS_MMPBSA.dat' -sp $inp_pdb.prmtop -cp $inp_pdb'_c.prmtop' -rp $inp_pdb'_r.prmtop' -lp $inp_pdb'_l.prmtop' -y *.inpcrd > progress.log 2>&1 
+$script_pre'MMPBSA.py' -O -i $scripts'/'mmpbsa.in -o $inp_pdb'_FINAL_RESULTS_MMPBSA.dat' -sp $inp_pdb.prmtop -cp $inp_pdb'_c.prmtop' -rp $inp_pdb'_r.prmtop' -lp $inp_pdb'_l.prmtop' -y *.inpcrd > progress.log 2>&1
 
 grep " 198," FINAL_DECOMP_MMPBSA.dat > log1
 grep " 199," FINAL_DECOMP_MMPBSA.dat > log2
