@@ -32,17 +32,18 @@ mkdir -p $temppath'/'$sequence
 cp $db'/scoring/weights/talaris2014.wts' $temppath'/'$sequence
 cp $db'/scoring/weights/talaris2014_cst.wts' $temppath'/'$sequence
 
-if [[ $torque -eq 1 ]]
-then
-	#in case restarting from previous job, copy any old files back
-	cp -r $outpath'/'$sequence'/'* $temppath'/'$sequence
-fi
+#in case restarting from previous job, copy any old files back
+cp -r $outpath'/'$sequence'/'* $temppath'/'$sequence
 
 cd $temppath'/'$sequence
 
 #Rosetta part
-#first kick off command to copy all files at 23:30 hours past this time. this will run in the background.
-$scripts'/'rsync_files.sh $temppath'/'$sequence'/' $outpath'/'$sequence'/' &
+
+if [[ $torque -eq 1 ]]
+then
+	#first kick off command to copy all files at 23:30 hours past this time. this will run in the background.
+	$scripts'/'rsync_files.sh $temppath'/'$sequence'/' $outpath'/'$sequence'/' &
+fi
 
 #run command should place output files (pdb, txt, and silent file) in the temppath folder
 $bin/discrim_sim.static.linuxgccrelease -database $db -s $inpath/pdbs/ly104_CASHL.pdb -out::path::pdb $temppath -enzdes::cstfile $inpath/pdbs/ly104cstfile.txt -run:preserve_header "@"$home"/"git_repos/general_src/enzflags -out::prefix $sequence -resfile $inpath/resfile/rfpackpept.txt
