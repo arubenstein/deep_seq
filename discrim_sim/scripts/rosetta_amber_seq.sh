@@ -8,6 +8,7 @@ outpath=$5
 sequence=$6
 home=$7
 scripts=$8
+torque=$9
 
 #declare functions
 check_file ()
@@ -25,16 +26,23 @@ check_file ()
 
 #preliminary commands
 
+mkdir -p $temppath'/'$sequence
+
 #copy scorefunction files from db to temppath
 cp $db'/scoring/weights/talaris2014.wts' $temppath'/'$sequence
 cp $db'/scoring/weights/talaris2014_cst.wts' $temppath'/'$sequence
 
-#in case restarting from previous job, copy any old files back
-cp -r $outpath'/'$sequence'/'* $temppath'/'$sequence
+if [[ $torque -eq 1 ]]
+then
+	#in case restarting from previous job, copy any old files back
+	cp -r $outpath'/'$sequence'/'* $temppath'/'$sequence
+fi
 
 cd $temppath'/'$sequence
 
 #Rosetta part
+#first kick off command to copy all files at 23:30 hours past this time. this will run in the background.
+$scripts'/'rsync_files.sh $temppath'/'$sequence'/' $outpath'/'$sequence'/' &
 
 #run command should place output files (pdb, txt, and silent file) in the temppath folder
 $bin/discrim_sim.static.linuxgccrelease -database $db -s $inpath/pdbs/ly104_CASHL.pdb -out::path::pdb $temppath -enzdes::cstfile $inpath/pdbs/ly104cstfile.txt -run:preserve_header "@"$home"/"git_repos/general_src/enzflags -out::prefix $sequence -resfile $inpath/resfile/rfpackpept.txt
@@ -52,7 +60,7 @@ do
 	#if file has not been created then run amber
 	if [[ $? -eq 1 ]]
 	then
-		$scripts'/amber_run_file.sh' $pn $temppath'/'$sequence $scripts 1
+		$scripts'/amber_run_file.sh' $pn $temppath'/'$sequence $scripts $torque
 	else
 		echo "Amber run already completed for $pdb_name"
 	fi

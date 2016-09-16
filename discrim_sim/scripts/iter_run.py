@@ -14,7 +14,7 @@ def main(server_num, queue_type, fen2, test_complete):
     #1. bash style, run 4000 jobs on 58 cores each on 7 gaann servers. interval = 4000/7. ncores = 58.
     #2. slurm style, run as slurm batch script and kick off 1000 jobs. interval = 1000. ncores = N/A
       #2a. fen2, add sbatch comments about this. interval = 1000. ncores = N/A.
-    #3. torque style, run as torque batch script and kick off 500 jobs (on 20 nodes, 25 processes each). interval = 500. ncores = N/A
+    #3. torque style, run as torque batch script and kick off 500 jobs (on 20 nodes, 24 processes each). interval = 500. ncores = N/A
 
     
     #if bash style server num is between 8 and 14
@@ -28,7 +28,8 @@ def main(server_num, queue_type, fen2, test_complete):
         script_suff = "qsub"
         a_or_w = 'a'
         background = "&"
-	script_pre=" -q long "
+	#script_pre=" -q long "
+        script_pre=""
     elif queue_type == "slurm":
         interval = 1000
         script_suff = "sbatch"
@@ -60,20 +61,15 @@ def main(server_num, queue_type, fen2, test_complete):
 	    except:
 		pass
 
-	    try:
-		os.mkdir(TEMPPATH + prefix)
-	    except: 
-	        pass
-
 	    #generic command
-            command = "{s}/rosetta_amber_seq.sh {bin} {db} {inpath} {temppath} {outpath} {p} {home} {s}".format( bin=ROSETTA_BIN, db=ROSETTA_DB, temppath=TEMPPATH, outpath=OUTPATH, inpath=INPATH, p=prefix, s=SCRIPTS, home=home )
+            command = "{s}/rosetta_amber_seq.sh {bin} {db} {inpath} {temppath} {outpath} {p} {home} {s} {torque}".format( bin=ROSETTA_BIN, db=ROSETTA_DB, temppath=TEMPPATH, outpath=OUTPATH, inpath=INPATH, p=prefix, s=SCRIPTS, home=home, torque=1 if queue_type == "torque" else 0 )
 	    
 	    #if slurm style, write script and run as a batch script
             if queue_type != "bash":
                 if queue_type == "slurm":
                     script_fn = OUTPATH + prefix + '/' + prefix + "." + script_suff
                 elif queue_type == "torque": 
-                    job_count=int(math.ceil(counter/25.0))
+                    job_count=int(math.ceil(counter/24.0))
                     script_fn = "{o}{c}.{suff}".format(o=OUTPATH, c=job_count, suff=script_suff)
 
 	        with open(script_fn, a_or_w) as script:
@@ -82,13 +78,13 @@ def main(server_num, queue_type, fen2, test_complete):
 		    elif queue_type == "slurm":
 		        header = "#!/bin/bash\n#SBATCH -n 1\n#SBATCH -c 1\n#SBATCH --export=ALL\n#SBATCH --job-name={p}\n#SBATCH -o {outpath}{p}/slurm{p}.out\n\n".format(p = prefix, outpath=OUTPATH)
                     elif queue_type == "torque": 
-			header = "#!/bin/bash\n#PBS -l nodes=1\n#PBS -l walltime=80:00:00\n#PBS -q tyr\n#PBS -N {c}\n#PBS -o {outpath}/{c}.out\n#PBS -e {outpath}/{c}.err\n".format(c = job_count, outpath=OUTPATH)
+			header = "#!/bin/bash\n#PBS -l nodes=1\n#PBS -l walltime=24:00:00\n#PBS -q tyr\n#PBS -N {c}\n#PBS -o {outpath}/{c}.out\n#PBS -e {outpath}/{c}.err\n".format(c = job_count, outpath=OUTPATH)
 		    
-		    #if queue_type is slurm or queue_type is torque and it's the first of 25 commands then write a header to the script
-		    if queue_type == "slurm" or counter % 25 == 1:
+		    #if queue_type is slurm or queue_type is torque and it's the first of 24 commands then write a header to the script
+		    if queue_type == "slurm" or counter % 24 == 1:
                         script.write(header)
 		    script.write(command + " > {outpath}{p}/{p}.log {bg}\n".format( outpath=OUTPATH, p=prefix, bg=background ))
-                    if queue_type == "slurm" or counter % 25 == 0 or counter == len(list_seqs):
+                    if queue_type == "slurm" or counter % 24 == 0 or counter == len(list_seqs):
                         if queue_type == "torque":
 			    script.write("\nwait\n")
 	                p = Popen(script_suff + script_pre + " " + script_fn, shell=True)
