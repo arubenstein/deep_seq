@@ -54,8 +54,8 @@ def main(seq_file, canonical, output_prefix):
     #print raise_matrix(T_mat,3)
     #T = raise_matrix(T_mat,10)
     #T = raise_matrix(T_mat,20)
-    x = []
-    y = []
+    x = [0]
+    y = [0]
 
     for i in range(1,30):
         x.append(i)
@@ -63,9 +63,9 @@ def main(seq_file, canonical, output_prefix):
 
     fig, ax = conv.create_ax(1, 1)
 
-    line.draw_actual_plot(x, y, "aa", ax[0,0], title="Speed of Traversing Functional Variant Graph", x_axis="# of Steps", y_axis="Fraction of Functional Variants Reached")
-
-    conv.save_fig(fig, output_prefix, "fraction_func", 5, 5)
+    line.draw_actual_plot(x, y, "aa", ax[0,0], title="Traversing Functional Variant Graph", x_axis="# of Steps", y_axis="Fraction Variants Reached")
+    ax[0,0].set_xlim(xmin=1)
+    conv.save_fig(fig, output_prefix, canonical + "_fraction_func", 6, 6, size=15)
 
 if __name__ == "__main__":
 

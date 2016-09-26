@@ -48,13 +48,22 @@ def categorize(list_val_tuples_cleaved, list_val_tuples_uncleaved, list_val_tupl
         categories_dict["Cleaved"] = ""
 
         for sample, x in list_val_tuples_uncleaved.items():
-            if x[0] > 0:
+            if x[0] < 0:
+	        categories_dict["Uncleaved"] = ""
+                break
+            elif x[0] > 0:
                 categories_dict["Uncleaved"] = categories_dict["Uncleaved"] + (sample)
         for sample, x in list_val_tuples_cleaved.items():
-            if x[0] > 0:
-                categories_dict["Cleaved"] = categories_dict["Cleaved"] + (sample)
+            if x[0] < 0:
+                categories_dict["Cleaved"] = ""
+                break
+            elif x[0] > 0:                
+	        categories_dict["Cleaved"] = categories_dict["Cleaved"] + (sample)
         for sample, x in list_val_tuples_middle.items():
-            if x[0] > 0:
+            if x[0] < 0:
+                categories_dict["Middle"] = ""
+                break
+            elif x[0] > 0:
                 categories_dict["Middle"] = categories_dict["Middle"] + (sample)  
      
     if categories_dict.get("Cleaved and Uncleaved") is None:
