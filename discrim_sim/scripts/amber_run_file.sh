@@ -4,7 +4,7 @@
 inp_pdb=$1
 path=$2
 scripts=$3
-torque=$4
+queue_type=$4
 
 full_pdb_path=$path'/'$inp_pdb'.pdb'
 outpath=$path'/'$inp_pdb'/'
@@ -13,12 +13,19 @@ mkdir -p $path'/'$inp_pdb
 
 perl $scripts'/modify2.pl' $full_pdb_path > $outpath'/'$inp_pdb'.pdb'
 
+rc="leaprc.ff12SB"
+
+if [[ $queue_type == "fen2" ]]
+then
+	rc="oldff/leaprc.ff14SB"
+fi
+
 cd $outpath
 #6.131s real
 rm -rf tleap.in
 cat >tleap.in <<EOF
 source leaprc.gaff
-source leaprc.ff12SB
+source "$rc" 
 loadamberparams frcmod.ionsjc_tip3p
 d = loadpdb "$inp_pdb.pdb"
 addions d Cl- 0
@@ -28,7 +35,7 @@ quit
 EOF
 tleap -f tleap.in
 
-if [[ $torque -eq 1 ]]
+if [[ $queue_type == "torque" ]]
 then
 	script_pre=$scripts'/'
 else

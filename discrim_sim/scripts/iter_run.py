@@ -62,7 +62,7 @@ def main(server_num, queue_type, fen2, test_complete):
 		pass
 
 	    #generic command
-            command = "{s}/rosetta_amber_seq.sh {bin} {db} {inpath} {temppath} {outpath} {p} {home} {s} {torque}".format( bin=ROSETTA_BIN, db=ROSETTA_DB, temppath=TEMPPATH, outpath=OUTPATH, inpath=INPATH, p=prefix, s=SCRIPTS, home=home, torque=1 if queue_type == "torque" else 0 )
+            command = "{s}/rosetta_amber_seq.sh {bin} {db} {inpath} {temppath} {outpath} {p} {home} {s} {torque}".format( bin=ROSETTA_BIN, db=ROSETTA_DB, temppath=TEMPPATH, outpath=OUTPATH, inpath=INPATH, p=prefix, s=SCRIPTS, home=home, torque='fen2' if fen2 else queue_type )
 	    
 	    #if slurm style, write script and run as a batch script
             if queue_type != "bash":

@@ -11,7 +11,6 @@ list_seqs=$2
 #fi
 
 #check that has not already been extracted
-last_file=$(tail -n 1 $silent_file | awk '{print $2}')
 
 done=0
 
@@ -26,17 +25,12 @@ done=0
 #	fi
 #fi
 
-if [ -f $last_file'.pdb' ]
-then
-	echo "$silent_file has already been extracted"
-else
 
 	sed -i 's/SER_connectOG/SER:MP-OG-connect/g' $silent_file
 	sed -i 's/CYS_connectC/CYS:MP-C-connect/g' $silent_file
-	sed -i 's/scratch/home/g' $silent_file
-        sed -i 's/alizarub/arubenstein/g' $silent_file
+	sed -i 's/home/scratch/g' $silent_file
+        sed -i 's/arubenstein/alizarub/g' $silent_file
 	nohup nice ~/Rosetta/main/source/bin/extract_pdbs.static.linuxgccrelease -database ~/Rosetta/main/database/ -in::file::silent $silent_file > $silent_file'.log'
-fi
 
 if [[ $list_seqs == "" ]]
 then

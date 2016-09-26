@@ -8,7 +8,7 @@ outpath=$5
 sequence=$6
 home=$7
 scripts=$8
-torque=$9
+queue_type=$9
 
 #declare functions
 check_file ()
@@ -17,8 +17,9 @@ check_file ()
 	status=1
         if [[ -s $f ]]; then
 	    in=( $( < $f ) )
-            if [[ $in -ne 0 ]]; then
+            if [[ $in != "0" ]]; then
 	        status=0
+		echo "$1 has already been run"
 	    fi
 	fi
 	return $status
@@ -39,7 +40,7 @@ cd $temppath'/'$sequence
 
 #Rosetta part
 
-if [[ $torque -eq 1 ]]
+if [[ $queue_type == "torque" ]]
 then
 	#first kick off command to copy all files at 23:30 hours past this time. this will run in the background.
 	$scripts'/'rsync_files.sh $temppath'/'$sequence'/' $outpath'/'$sequence'/' &
@@ -61,7 +62,7 @@ do
 	#if file has not been created then run amber
 	if [[ $? -eq 1 ]]
 	then
-		$scripts'/amber_run_file.sh' $pn $temppath'/'$sequence $scripts $torque
+		$scripts'/amber_run_file.sh' $pn $temppath'/'$sequence $scripts $queue_type
 	else
 		echo "Amber run already completed for $pdb_name"
 	fi
@@ -78,5 +79,5 @@ do
 	fi
 done
 
- move all data back
+#move all data back
 cp -r $temppath'/'$sequence'/'* $outpath'/'$sequence'/'
