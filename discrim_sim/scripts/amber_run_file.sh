@@ -4,7 +4,7 @@
 inp_pdb=$1
 path=$2
 scripts=$3
-torque=$4
+queue_type=$4
 
 full_pdb_path=$path'/'$inp_pdb'.pdb'
 outpath=$path'/'$inp_pdb'/'
@@ -13,12 +13,19 @@ mkdir -p $path'/'$inp_pdb
 
 perl $scripts'/modify2.pl' $full_pdb_path > $outpath'/'$inp_pdb'.pdb'
 
+rc="leaprc.ff12SB"
+
+if [[ $queue_type == "fen2" ]]
+then
+	rc="oldff/leaprc.ff14SB"
+fi
+
 cd $outpath
 #6.131s real
 rm -rf tleap.in
 cat >tleap.in <<EOF
 source leaprc.gaff
-source leaprc.ff12SB
+source "$rc" 
 loadamberparams frcmod.ionsjc_tip3p
 d = loadpdb "$inp_pdb.pdb"
 addions d Cl- 0
@@ -28,20 +35,21 @@ quit
 EOF
 tleap -f tleap.in
 
-if [[ $torque -eq 1 ]]
+if [[ $queue_type == "torque" ]]
 then
 	script_pre=$scripts'/'
 else
 	script_pre=""
+fi
 
 #3.901s real
-$script_preante-MMPBSA.py -p $inp_pdb.prmtop -c $inp_pdb'_c.prmtop' -s @Cl-
+$script_pre'ante-MMPBSA.py' -p $inp_pdb.prmtop -c $inp_pdb'_c.prmtop' -s @Cl-
 #5.350s real
-$script_preante-MMPBSA.py -p $inp_pdb'_c.prmtop' -r $inp_pdb'_r.prmtop' -l $inp_pdb'_l.prmtop' -n :197-206
+$script_pre'ante-MMPBSA.py' -p $inp_pdb'_c.prmtop' -r $inp_pdb'_r.prmtop' -l $inp_pdb'_l.prmtop' -n :197-206
 
 
 #26.889s real
-$scripts_preMMPBSA.py -O -i $scripts'/'mmpbsa.in -o $inp_pdb'_FINAL_RESULTS_MMPBSA.dat' -sp $inp_pdb.prmtop -cp $inp_pdb'_c.prmtop' -rp $inp_pdb'_r.prmtop' -lp $inp_pdb'_l.prmtop' -y *.inpcrd > progress.log 2>&1 
+$script_pre'MMPBSA.py' -O -i $scripts'/'mmpbsa.in -o $inp_pdb'_FINAL_RESULTS_MMPBSA.dat' -sp $inp_pdb.prmtop -cp $inp_pdb'_c.prmtop' -rp $inp_pdb'_r.prmtop' -lp $inp_pdb'_l.prmtop' -y *.inpcrd > progress.log 2>&1
 
 grep " 198," FINAL_DECOMP_MMPBSA.dat > log1
 grep " 199," FINAL_DECOMP_MMPBSA.dat > log2
