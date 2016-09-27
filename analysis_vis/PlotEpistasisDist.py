@@ -11,12 +11,11 @@ from general_seq import conv
 from general_seq import seq_IO
 from plot import conv as pconv
 from plot import scatterplot 
+from plot import bar
 from matplotlib_venn import venn2
 
 def plot_epi(epistasis, total, ax, title_pre):
-    scatterplot.draw_actual_plot(ax, xrange(2,6), [ e/total for e, total in zip(epistasis, total)],
-                'k', title_pre + " Epistasis vs. # of Mutations", "# of Mutations", "Fraction of Total Cases",
-                cm="Blues_r", size=40, edgecolors='k', label=None, secondary_y=False, connect_dots=False) 
+    bar.draw_actual_plot(ax, [ e/total for e, total in zip(epistasis, total) ], 'g', title_pre + " Epistasis", "# of Mutations", "Fraction of Total Cases", tick_label=xrange(2,6) )
 
 def main(epistasis_file):
     
@@ -48,21 +47,22 @@ def main(epistasis_file):
 
     seq_func = set([ key[1] for key,val in dict_epistasis.items() if val[3] == "CLEAVED" ])
     seq_pred_func = set([ key[1] for key,val in dict_epistasis.items() if all(v == "CLEAVED" for v in val[6]) ]) 
-    print seq_pred_func
-    fig, axarr = pconv.create_ax(4, 1, shx=True, shy=True)
-
+    fig, axarr = pconv.create_ax(3, 1, shx=True, shy=True)
+    fig2, axarr2 = pconv.create_ax(1, 1)
     plot_epi(neg_epistasis, n_total, axarr[0,0], "Negative")
     plot_epi(no_epistasis, n_total, axarr[0,1], "No")
     plot_epi(pos_epistasis, n_total, axarr[0,2], "Positive")
     n_func_frac = [ func/total for func, total in zip(n_functional, n_total) ]
     n_pred_frac = [ pred/total for pred, total in zip(n_should_be_functional, n_total) ]
-    scatterplot.plot_series(axarr[0,3], [(xrange(2,6),n_func_frac,"% Cleaved"),(xrange(2,6),n_pred_frac,"% Pred Cleaved")], "", "Number of Mutations", "Fraction of Total Cases", size=40, connect_dots=True)
+    scatterplot.plot_series(axarr2[0,0], [(range(2,6),n_func_frac,"% Cleaved"),(range(2,6),n_pred_frac,"% Pred Cleaved")], "", "Number of Mutations", "Fraction of Total Cases", size=40, connect_dots=True, alpha=1.0)
+    axarr2[0,0].set_ylim([0,1.0])
     fig_venn, axarr_venn = pconv.create_ax(1, 1)
 
     venn2([seq_func, seq_pred_func], set_labels = ["Cleaved", "Pred Cleaved"], ax=axarr_venn[0,0])
 
-    pconv.save_fig(fig, epistasis_file, "plot", 30, 5, tight=True, size=10)
-    pconv.save_fig(fig_venn, epistasis_file, "venn", 5, 5, tight=True, size=10)
+    pconv.save_fig(fig, epistasis_file, "plot", 12, 4, tight=True, size=12)
+    pconv.save_fig(fig2, epistasis_file, "pred_v_cl", 5, 5, tight=True, size=10)
+    pconv.save_fig(fig_venn, epistasis_file, "venn", 5, 5, tight=True, size=14)
 
 
 if __name__ == "__main__":

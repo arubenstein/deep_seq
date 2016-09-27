@@ -82,12 +82,14 @@ def plot_heatmap(ax, data, colormap, ticks, labels, xlabel, ylabel, title, vmin,
     ax.xaxis.set_ticks_position('none') 
     return CS
 
-def main(sequence_file, output_prefix):
+def main(sequence_file):
     
     sequences = seq_IO.read_sequences(sequence_file)
     n_char = len(sequences[0])
 
     fig, axarr = pconv.create_ax(6, 2, shx=False, shy=False)
+    fig2, axarr2 = pconv.create_ax(1, 1, shx=False, shy=False)
+
     ticks = [ i + 0.5 for i in np.arange(0,20) ]
     aa_string = 'DEKRHNQYCGSTAMILVFWP'
     maxes = []
@@ -111,8 +113,8 @@ def main(sequence_file, output_prefix):
         for ind1 in xrange(0, 20):
             for ind2 in xrange(0, 20):
 		p = (avg_pos1[ind1]+avg_pos2[ind2]-data[ind1,ind2])/(19) #n-1=19
-                #p = p if p > 0.05 else 0.05
-                #data[ind1,ind2] = data[ind1,ind2]/p
+                p = p if p > 0.05 else 0.05 #min 0.05 for rcw
+                data[ind1,ind2] = data[ind1,ind2]/p #rcw 
 	maxes.append(np.amax(data))
         mins.append(np.amin(data))
         full_data.append(data)
@@ -122,6 +124,8 @@ def main(sequence_file, output_prefix):
     perc = np.percentile(full_data_flat, 99.9)
    
     for ind, (data, (pos1, pos2)) in enumerate(zip(full_data, positions)):
+	if pos1 == 2 and pos2 == 3:
+	    CS2 = plot_heatmap(axarr2[0,0], data, shrunk_cmap, ticks, list(aa_string), "position {0}".format(pos2+1), "position {0}".format(pos1+1), "", vmin = -1.0 * perc, vmax = perc)
 	y_ind = ind % 5
         x_ind = math.floor(ind/5)
         CS = plot_heatmap(axarr[x_ind,y_ind], data, shrunk_cmap, ticks, list(aa_string), "position {0}".format(pos2+1), "position {0}".format(pos1+1), "MI: {0:.4f}".format(conv.covar_MI(sequences, pos1, pos2)), vmin = -1.0 * perc, vmax = perc)
@@ -132,14 +136,18 @@ def main(sequence_file, output_prefix):
     CS = plot_heatmap(axarr[0,5], average_data, shrunk_cmap, ticks, list(aa_string), "", "", "Averages", vmin = -1.0 * perc, vmax = perc) 
 
     CS = plot_heatmap(axarr[1,5], max_data, shrunk_cmap, ticks, list(aa_string), "", "", "Maximums", vmin = -1.0 * perc, vmax = perc)
-    print maxes
-    print mins
     fig.subplots_adjust(right=0.8)
     cbar_ax = fig.add_axes([0.85, 0.15, 0.05, 0.7])
-   
+  
+    fig2.subplots_adjust(right=0.8)
+    cbar_ax2 = fig2.add_axes([0.85, 0.15, 0.05, 0.7])
+ 
     plt.colorbar(CS, cax=cbar_ax)
+    plt.colorbar(CS2, cax=cbar_ax2)
 
     pconv.save_fig(fig, sequence_file, "heatmap", 18, 6, tight=False, size=7)
+    pconv.save_fig(fig2, sequence_file, "heatmap3_4", 4, 4, tight=False, size=10)
+
 
 if __name__ == "__main__":
 
@@ -147,8 +155,6 @@ if __name__ == "__main__":
 
     parser.add_argument ('--sequence_file', '-d', help="text file which contains sequences")
 
-    parser.add_argument ('--output_prefix', help='output file prefix')
-
     args = parser.parse_args()
 
-    main(args.sequence_file, args.output_prefix)
+    main(args.sequence_file)

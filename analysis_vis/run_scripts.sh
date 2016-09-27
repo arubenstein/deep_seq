@@ -31,3 +31,5 @@ python EpistasisAllSeqs.py --sequence_list ~/git_repos/deep_seq/analysis_vis/seq
 ./extract_data_seq_categorize.sh ~/Dropbox/Research/Khare/deep_seq/norm_counts11/summary_WT_nextseq.csv
 
 python convert_seq_features.py --sequence_list ~/git_repos/deep_seq/analysis_vis/seq_lists_norm_counts11_norm_counts11/WT_nextseq_cleaved.txt --conversion_type alpha
+
+python PlotEpistasisDist.py --epistasis results/epistasis/WT_nextseq_epi.csv

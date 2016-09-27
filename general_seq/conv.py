@@ -23,7 +23,7 @@ def retrieve_freq_one_pos(list_seqs, pos):
     dict_letters = {}
     for letter in ascii_uppercase:
         dict_letters[letter] = list_str.count(letter)
-    lambda_term = 0 #as seen in Buslje et al. 2009
+    lambda_term = len(list_seqs)/20.0 #as seen in Buslje et al. 2009
     corrected_dict = { key : lambda_term + value for key, value in dict_letters.items() }
     return corrected_dict
 
@@ -32,7 +32,7 @@ def retrieve_freq_two_pos(list_seqs, pos1, pos2):
     dict_letters = collections.defaultdict(int)
     for item in list_str:
         dict_letters[item] += 1
-    lambda_term = 0 #as seen in Buslje et al. 2009
+    lambda_term = len(list_seqs)/400.0 #as seen in Buslje et al. 2009
     corrected_dict = { key : lambda_term + value for key, value in dict_letters.items() }
     return corrected_dict
 
