@@ -34,7 +34,7 @@ cp $db'/scoring/weights/talaris2014.wts' $temppath'/'$sequence
 cp $db'/scoring/weights/talaris2014_cst.wts' $temppath'/'$sequence
 
 #in case restarting from previous job, copy any old files back
-cp -r $outpath'/'$sequence'/'* $temppath'/'$sequence
+rsync -av $outpath'/'$sequence'/'* $temppath'/'$sequence
 
 cd $temppath'/'$sequence
 
@@ -49,7 +49,7 @@ fi
 #run command should place output files (pdb, txt, and silent file) in the temppath folder
 $bin/discrim_sim.static.linuxgccrelease -database $db -s $inpath/pdbs/ly104_CASHL.pdb -out::path::pdb $temppath -enzdes::cstfile $inpath/pdbs/ly104cstfile.txt -run:preserve_header "@"$home"/"git_repos/general_src/enzflags -out::prefix $sequence -resfile $inpath/resfile/rfpackpept.txt
 
-cp -r $temppath'/'$sequence'/'* $outpath'/'$sequence'/'
+rsync -av $temppath'/'$sequence'/'* $outpath'/'$sequence'/'
 
 #loop through pdb files and run amber on them
 for pdb_name in $(ls *.pdb)
@@ -73,11 +73,26 @@ do
         if [[ $? -eq 0 ]]; then
 		rm $pdb_name
 		#in case restarting from previous job 
-		rm -f $outpath'/'$sequence'/'$pn'.pdb'
 	else
 		echo "Warning - amber run did not complete and pdb file $pdb_name has not yet been deleted"
 	fi
 done
 
 #move all data back
-cp -r $temppath'/'$sequence'/'* $outpath'/'$sequence'/'
+rsync -av $temppath'/'$sequence'/'* $outpath'/'$sequence'/'
+
+for pdb_name in $(ls $outpath'/'$sequence'/'*.pdb)
+do
+        pn=$(basename $pdb_name '.pdb')
+
+        #check file after running amber
+        check_file $pn'_dat_complex'
+        #if file has been created then rm pdb files
+        if [[ $? -eq 0 ]]; then
+                rm -f $pdb_name
+                #in case restarting from previous job 
+                rm -f $outpath'/'$sequence'/'$pn'.pdb'
+        else
+                echo "Warning - amber run did not complete and pdb file $pdb_name has not yet been deleted"
+        fi
+done

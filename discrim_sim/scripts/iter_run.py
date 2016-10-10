@@ -78,7 +78,7 @@ def main(server_num, queue_type, fen2, test_complete):
 		    elif queue_type == "slurm":
 		        header = "#!/bin/bash\n#SBATCH -n 1\n#SBATCH -c 1\n#SBATCH --export=ALL\n#SBATCH --job-name={p}\n#SBATCH -o {outpath}{p}/slurm{p}.out\n\n".format(p = prefix, outpath=OUTPATH)
                     elif queue_type == "torque": 
-			header = "#!/bin/bash\n#PBS -l nodes=1\n#PBS -l walltime=24:00:00\n#PBS -q tyr\n#PBS -N {c}\n#PBS -o {outpath}/{c}.out\n#PBS -e {outpath}/{c}.err\n".format(c = job_count, outpath=OUTPATH)
+			header = "#!/bin/bash\n#PBS -l nodes=1\n#PBS -l walltime=24:00:00\n#PBS -q tyr\n#PBS -N {c}\n#PBS -o {outpath}/{c}.out\n#PBS -e {outpath}/{c}.err\nsource ~/.bashrc\n\n".format(c = job_count, outpath=OUTPATH)
 		    
 		    #if queue_type is slurm or queue_type is torque and it's the first of 24 commands then write a header to the script
 		    if queue_type == "slurm" or counter % 24 == 1:
