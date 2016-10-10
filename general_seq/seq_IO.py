@@ -3,21 +3,33 @@
 """Convenience module to perform sequence IO"""
 import os
 
-#todo - should this be a dict of additional params or something?
-def read_sequences( seqfile, additional_params=False, ind_type=None):
+#todo - should this be a dict of additional params or something? and generally fix workflow not very solid decision tree
+def read_sequences( seqfile, additional_params=False, ind_type=None, header=False):
     """Reads list of sequences. If additional_params is set to True, reads each line as a list of sequence + additional parameters in that line."""
     with open(seqfile) as f:
         lines = f.read().splitlines()
     if additional_params:
         lines = [ l.split(',') for l in lines ]
-    if ind_type is not None:
-        new_lines = []
+    if header:
+        header_line = lines.pop(0)    
+
+    if additional_params:
+        #convert additional params as necessary
+        if ind_type is None:
+	    ind_type = {}
+            for ind in xrange(1,len(lines[0])): 
+                try:
+                    float(lines[0][ind])
+                    ind_type[ind] = float
+                except ValueError:
+	            pass
         for l in lines:
-            new_l = l[:]
             for ind,dtype in ind_type.items():
-                new_l[ind] = dtype(l[ind])
-            new_lines.append(new_l)
-        lines = new_lines    
+                l[ind] = dtype(l[ind])
+
+        if header:
+	    sequence_dict = { l[0] : dict(zip(header_line[1:],l[1:])) for l in lines }
+	    lines = sequence_dict
     return lines
 
 def read_counts(counts_filename):

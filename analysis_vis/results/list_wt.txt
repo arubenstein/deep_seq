@@ -1,0 +1,3 @@
+/Users/arubenstein/git_repos/deep_seq/processing_seqs/results/enrich/1/MP02Tr20_Fr3_MP07Tr20_Fr3/data/output/ratios_MP07Tr20_Fr3.fast_R1_PRO_qc_MP02Tr20_Fr3.fast_R1_PRO_qc
+/Users/arubenstein/git_repos/deep_seq/processing_seqs/results/enrich/1/MP02Tr20_Fr3_MP09Tr20_Fr3/data/output/ratios_MP09Tr20_Fr3.fast_R1_PRO_qc_MP02Tr20_Fr3.fast_R1_PRO_qc
+/Users/arubenstein/git_repos/deep_seq/processing_seqs/results/enrich/1/MP02Tr20_Fr3_MP08Tr20_Fr3/data/output/ratios_MP08Tr20_Fr3.fast_R1_PRO_qc_MP02Tr20_Fr3.fast_R1_PRO_qc
