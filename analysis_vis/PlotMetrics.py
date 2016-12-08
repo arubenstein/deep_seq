@@ -41,10 +41,10 @@ def main(list_nodes, output_prefix, metric):
 	else:
 	    log = False
 	if key == "Fraction_Cleaved":
-            data = [ conv.fraction_neighbors_cleaved(cleaved_seq.keys(), uncleaved_seq.keys(), middle_seq.keys(), cleaved_seq.keys()),
-		     conv.fraction_neighbors_cleaved(cleaved_seq.keys(), uncleaved_seq.keys(), middle_seq.keys(), middle_seq.keys()),
-                     conv.fraction_neighbors_cleaved(cleaved_seq.keys(), uncleaved_seq.keys(), middle_seq.keys(), uncleaved_seq.keys())]
-	    normed = False
+            data = [ conv.fraction_neighbors_cleaved(cleaved_seq.keys(), uncleaved_seq.keys(), middle_seq.keys(), cleaved_seq.keys()).values(),
+		     conv.fraction_neighbors_cleaved(cleaved_seq.keys(), uncleaved_seq.keys(), middle_seq.keys(), middle_seq.keys()).values(),
+                     conv.fraction_neighbors_cleaved(cleaved_seq.keys(), uncleaved_seq.keys(), middle_seq.keys(), uncleaved_seq.keys()).values()]
+	    normed = True
 	else:
             data = [ get_data_from_dict(cleaved_seq, key), get_data_from_dict(middle_seq, key), get_data_from_dict(uncleaved_seq, key) ]
 	    normed = True

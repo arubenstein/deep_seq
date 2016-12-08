@@ -3,6 +3,7 @@
 import collections
 from string import ascii_uppercase
 import math
+import itertools
 
 def hamdist(str1, str2):
     '''Determines hamming distance between two strings'''
@@ -11,6 +12,12 @@ def hamdist(str1, str2):
         if ch1 != ch2:
             diffs += 1
     return diffs
+
+def gen_hamdist_one(seq):
+    aa_string = 'DEKRHNQYCGSTAMILVFWP'
+
+    return [ seq[0:ind] + char + seq[ind+1:] for ind in xrange(0,len(seq)) for char in aa_string ] 
+ 
 
 def covar_MI(list_seqs, pos1, pos2):
     e1 = calc_entropy(calc_probs(retrieve_freq_one_pos(list_seqs, pos1)))
@@ -58,3 +65,20 @@ def calc_epi_log(list_seqs, pos1, pos2, aa1, aa2):
     epi = math.log((p_both/(p1*p2)), 20)
     return epi 
 
+def fraction_neighbors_cleaved(cleaved_list, uncleaved_list, middle_list, list_from, test_existence=False):
+    list_floats = {}
+
+    for seq in list_from:
+	if test_existence and seq not in cleaved_list:
+	    continue
+        cleaved_seqs = sum([1 for s in cleaved_list if hamdist(seq,s) == 1])
+        uncleaved_seqs = sum([1 for s in uncleaved_list if hamdist(seq,s) == 1])
+        middle_seqs = sum([1 for s in middle_list if hamdist(seq,s) == 1])
+        if cleaved_seqs > 0 or uncleaved_seqs > 0 or middle_seqs > 0:
+            total = uncleaved_seqs+middle_seqs+cleaved_seqs
+            list_floats[seq] = float(cleaved_seqs)/total
+    return list_floats
+
+def generate_random_seqs(length_seq):
+    for string in itertools.imap(''.join, itertools.product('ACDEFGHIKLMNPQRSTVWY', repeat=length_seq)):
+        yield string

@@ -23,7 +23,8 @@ def average_metrics( dict_metrics, metric_labels ):
     for seq, list_metrics in dict_metrics.items():
         for label in metric_labels:
 	    l = [ val[label] for val in list_metrics ]
-            averaged_metrics[seq][label] = float(sum(l))/len(l)
+	    if len(l) > 0:
+	        averaged_metrics[seq][label] = float(sum(l))/len(l)
             
     return averaged_metrics
 def list_metrics( cleaved_seq_dict, sequences, labels ):
@@ -34,6 +35,15 @@ def list_metrics( cleaved_seq_dict, sequences, labels ):
 
     return average_metrics(dict_metrics, labels) 
 
+def average_fraction_neighbors_cleaved( cleaved_seq_dict, middle_seq_dict, uncleaved_seq_dict, list_cleaved_seqs ):
+    metrics_dict = { s : [] for s in list_cleaved_seqs }
+    for label in cleaved_seq_dict.keys():
+        seqs_fracs = conv.fraction_neighbors_cleaved(cleaved_seq_dict[label].keys(), middle_seq_dict[label].keys(), uncleaved_seq_dict[label].keys(), list_cleaved_seqs, test_existence=True)
+	for seq, frac in seqs_fracs.items():
+	    metrics_dict[seq].append({"fraction_cleaved" : frac }) 
+    am = average_metrics( metrics_dict, ["fraction_cleaved"])
+    return [ v for s, l in am.items() for k, v in l.items() ] 
+    	
 def main(list_nodes, output_prefix, metric):
 
     cleaved_seq = {}
@@ -64,11 +74,19 @@ def main(list_nodes, output_prefix, metric):
 
     count_seqs = Counter(list_seqs)
 
-    seqs_5 = list_metrics( cleaved_seq, [ s for s in list_seqs if count_seqs[s] == 5 ], orig_labels_to_plot)
-    seqs_4 = list_metrics( cleaved_seq, [ s for s in list_seqs if count_seqs[s] == 4 ], orig_labels_to_plot)
-    seqs_3 = list_metrics( cleaved_seq, [ s for s in list_seqs if count_seqs[s] == 3 ], orig_labels_to_plot)
-    seqs_2 = list_metrics( cleaved_seq, [ s for s in list_seqs if count_seqs[s] == 2 ], orig_labels_to_plot)
-    seqs_1 = list_metrics( cleaved_seq, [ s for s in list_seqs if count_seqs[s] == 1 ], orig_labels_to_plot)
+    seqs_5_l = [ s for s in list_seqs if count_seqs[s] == 5 ]
+    seqs_4_l = [ s for s in list_seqs if count_seqs[s] == 4 ]
+    seqs_3_l = [ s for s in list_seqs if count_seqs[s] == 3 ]
+    seqs_2_l = [ s for s in list_seqs if count_seqs[s] == 2 ]
+    seqs_1_l = [ s for s in list_seqs if count_seqs[s] == 1 ]
+
+
+    if metric != "Fraction_Cleaved":
+        seqs_5 = list_metrics( cleaved_seq, seqs_5_l, orig_labels_to_plot)
+        seqs_4 = list_metrics( cleaved_seq, seqs_4_l, orig_labels_to_plot)
+        seqs_3 = list_metrics( cleaved_seq, seqs_3_l, orig_labels_to_plot)
+        seqs_2 = list_metrics( cleaved_seq, seqs_2_l, orig_labels_to_plot)
+        seqs_1 = list_metrics( cleaved_seq, seqs_1_l, orig_labels_to_plot)
 
     for ind, key in enumerate(labels_to_plot):
 	if key == "pageranks":
@@ -76,12 +94,12 @@ def main(list_nodes, output_prefix, metric):
 	else:
 	    log = False
 	if key == "Fraction_Cleaved":
-            data = [ conv.fraction_neighbors_cleaved(cleaved_seq.keys(), uncleaved_seq.keys(), middle_seq.keys(), seqs_5),
-                     conv.fraction_neighbors_cleaved(cleaved_seq.keys(), uncleaved_seq.keys(), middle_seq.keys(), seqs_4),
-                     conv.fraction_neighbors_cleaved(cleaved_seq.keys(), uncleaved_seq.keys(), middle_seq.keys(), seqs_3),
-                     conv.fraction_neighbors_cleaved(cleaved_seq.keys(), uncleaved_seq.keys(), middle_seq.keys(), seqs_2),
-                     conv.fraction_neighbors_cleaved(cleaved_seq.keys(), uncleaved_seq.keys(), middle_seq.keys(), seqs_1)]
-	    normed=False
+            data = [ average_fraction_neighbors_cleaved(cleaved_seq, uncleaved_seq, middle_seq, seqs_5_l),
+                     average_fraction_neighbors_cleaved(cleaved_seq, uncleaved_seq, middle_seq, seqs_4_l),
+                     average_fraction_neighbors_cleaved(cleaved_seq, uncleaved_seq, middle_seq, seqs_3_l),
+                     average_fraction_neighbors_cleaved(cleaved_seq, uncleaved_seq, middle_seq, seqs_2_l),
+                     average_fraction_neighbors_cleaved(cleaved_seq, uncleaved_seq, middle_seq, seqs_1_l)]
+	    normed=True
         else:
             data = [ get_data_from_dict(seqs_5, key), get_data_from_dict(seqs_4, key), get_data_from_dict(seqs_3, key), get_data_from_dict(seqs_2, key), get_data_from_dict(seqs_1, key) ]
 	    normed=True 

@@ -21,7 +21,7 @@ def main(list_sequence_names, output_prefix):
 
     venn3(sequence_list, set_labels = labels, ax=ax[0,0]) 
     
-    pconv.save_fig(fig, output_prefix, '_'.join(labels)+"_venn", 6, 6, size=15)
+    pconv.save_fig(fig, output_prefix, '_'.join(labels)+"_venn", 10, 10, size=12)
 
 if __name__ == "__main__":
 
