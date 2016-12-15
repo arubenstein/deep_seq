@@ -1,15 +1,14 @@
 #!/bin/bash
 
-path=~/git_repos/deep_seq/analysis_vis/seq_lists_shiryaev/
+path=~/git_repos/deep_seq/analysis_vis/seq_lists_norm_counts11/
 conversion_type=$1
 
-for seq_list in $(ls $path*.txt)
-do
+cd $path
 
-    if [[ ! $seq_list =~ "list3M5L" ]]
-    then
-        continue
-    fi
+for seq_list_name in $(ls $path*_sequence_features_$conversion_type'.csv')
+do
+	
+    seq_list=$(basename $seq_list_name "_sequence_features_"$conversion_type".csv")".txt"
 
     if [[ $seq_list =~ "uncleaved" ]]
     then
@@ -23,7 +22,7 @@ do
 
     base=$(basename $seq_list '.txt')
     echo $base
-    grep -f $seq_list $path'structure_features.csv' | sort > $path$base'_structure_features.csv'
+    grep -f $seq_list ~/git_repos/deep_seq/analysis_vis/input/'structure_features.csv' | sort > $path$base'_structure_features.csv'
     awk -F, '{print $1}' $path$base'_structure_features.csv' > $path$base'_seqs_data.list' 
     grep -f $path$base'_seqs_data.list' $path$base'_structure_features.csv' | awk -F, -v l=$label 'BEGIN{OFS=","}; {for (i=2; i<=NF; i++) printf $i","}{print l}' > $path$base'_struct.csv'
     grep -f $path$base'_seqs_data.list' $path$base'_sequence_features_'$conversion_type'.csv' | awk -F, -v l=$label 'BEGIN{OFS=","}; {for (i=2; i<=NF; i++) printf $i","}{print l}'  > $path$base'_seq_'$conversion_type'.csv'
@@ -31,6 +30,8 @@ do
     paste -d'\0' $path$base'_seq_'$conversion_type'_nolabel.csv' $path$base'_struct.csv' > $path$base'_structseq_'$conversion_type'.csv'
      
 done
+
+exit
 
 while read line
 do

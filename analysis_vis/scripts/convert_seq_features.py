@@ -50,8 +50,8 @@ def main(list_sequence_names, conversion_type="alpha"):
     #out.write(','.join(["Sequence"] + [ str(i) for i in xrange(1,len(sequences[0])+1)] ))
     #out.write("\n")
     for seq, features in sorted(sequence_features.items()):
-	#out.write(",".join( [seq] + ( features ) ))
-        out.write(",".join( features ) )
+	out.write(",".join( [seq] + ( features ) ))
+        #out.write(",".join( features ) )
         out.write("\n")
 
 if __name__ == "__main__":
