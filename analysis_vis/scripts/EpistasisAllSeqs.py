@@ -71,27 +71,34 @@ def main(list_sequence_names, output_prefix):
     mut_func = { "Both_Functional" : [], "Both_Nonfunctional" : [], "One_Functional" : [] }
     mut_nonfunc = { "Both_Functional" : [], "Both_Nonfunctional" : [], "One_Functional" : [] }
 
-    for can in list_sequences[labels.index("CLEAVED")]: 
+    prod = itertools.product(list_sequences[labels.index("CLEAVED")], extended_list_sequences)
+    pairs = set()
+
+    for x, y in prod:
+        if x[0] != y[0]:
+           pairs.add(frozenset((x, y)))
+    print "done making set"
+    for can, seq_fit in pairs: 
 	canonical_seq = can[0]
-        for seq_fit in extended_list_sequences: 
-            seq = seq_fit[0]
-            fit = seq_fit[1] 
-            mut_dict = mut_func if fit == 1 else mut_nonfunc
+        seq = seq_fit[0]
+        fit = seq_fit[1] 
+        mut_dict = mut_func if fit == 1 else mut_nonfunc
             
-            dist = conv.hamdist(canonical_seq,seq)
-            if dist <= 1:
-                continue 
-            list_inter, list_fit = get_inter_fitness(canonical_seq, seq, dict_seq_fit)
-            if None not in list_fit:
-		if dist == 2:
-                    sum_fit = sum(list_fit)
-                    if sum_fit > 1.95:
-                        mut_dict["Both_Functional"].append((canonical_seq, seq, list_inter, list_fit))
-                    elif sum_fit < 0.05:
-                        mut_dict["Both_Nonfunctional"].append((canonical_seq, seq, list_inter, list_fit))
-                    else: #either one uncleaved or one middle
-		        mut_dict["One_Functional"].append((canonical_seq, seq, list_inter, list_fit))
-                epi[(canonical_seq,seq)] = (calc_epi(list_fit, fit),fit,list_fit,list_inter)
+        dist = conv.hamdist(canonical_seq,seq)
+        if dist <= 1:
+            continue 
+        list_inter, list_fit = get_inter_fitness(canonical_seq, seq, dict_seq_fit)
+        if None not in list_fit:
+            if dist == 2:
+                sum_fit = sum(list_fit)
+            if sum_fit > 1.95:
+                mut_dict["Both_Functional"].append((canonical_seq, seq, list_inter, list_fit))
+            elif sum_fit < 0.05:
+                mut_dict["Both_Nonfunctional"].append((canonical_seq, seq, list_inter, list_fit))
+            else: #either one uncleaved or one middle
+		mut_dict["One_Functional"].append((canonical_seq, seq, list_inter, list_fit))
+            epi[(canonical_seq,seq)] = (calc_epi(list_fit, fit),fit,list_fit,list_inter)
+    print "done calc epi" 
     epi_double_out.write("Starting,Starting_Ratio,Ending,Ending_Ratio,Status_Ending,Status_Intermediates,Inter1_Seq,Inter1_Fit,Inter1_Ratio,Inter2_Seq,Inter2_Fit,Inter2_Ratio\n")
     for label, list_muts in mut_func.items():
         for (can, seq, list_inter, list_fit) in list_muts:
@@ -108,7 +115,7 @@ def main(list_sequence_names, output_prefix):
 			",".join([ "{0},{1},{2}".format(s,fitness_to_str(f),dict_seq_ratio[s]) for f,s in zip(list_fit,list_inter)])) for (can,seq), (e,fit,list_fit,list_inter) in epi.items()] ) ) 
     epi_out.close()
     epi_double_out.close()
-
+    print "done writing epi"
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description=__doc__)

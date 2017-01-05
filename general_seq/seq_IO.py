@@ -29,8 +29,12 @@ def read_sequences( seqfile, additional_params=False, ind_type=None, header=Fals
 
         if header:
 	    sequence_dict = { l[0] : dict(zip(header_line[1:],l[1:])) for l in lines }
-	    lines = sequence_dict
-    return lines
+	    sequences = sequence_dict
+	else:
+	    sequences = [ tuple(l) for l in lines ]
+    else:
+	sequences = lines
+    return sequences
 
 def read_counts(counts_filename):
     """Reads counts file into dict of counts"""
