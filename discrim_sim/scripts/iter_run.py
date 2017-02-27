@@ -7,8 +7,9 @@ import itertools
 import math
 from subprocess import Popen
 import glob
+from shutil import copyfile
 
-def main(server_num, queue_type, fen2, test_complete):
+def main(server_num, queue_type, fen2, test_complete, seqfile):
 
     #3 possible server cases
     #1. bash style, run 4000 jobs on 58 cores each on 7 gaann servers. interval = 4000/7. ncores = 58.
@@ -31,7 +32,7 @@ def main(server_num, queue_type, fen2, test_complete):
 	#script_pre=" -q long "
         script_pre=""
     elif queue_type == "slurm":
-        interval = 1000
+        interval = 8000 
         script_suff = "sbatch"
         a_or_w = 'w'
         background = ""
@@ -42,18 +43,29 @@ def main(server_num, queue_type, fen2, test_complete):
 
     ps = []    
 
-    #set list_seqs according to whether or not seqfile is present.
-    list_seqs = [ string for string in itertools.imap(''.join, itertools.product('ACDEFGHIKLMNPQRSTVWY', repeat=3)) ]
+     #set list_seqs according to whether or not seqfile is present.
+     if seqfile == "":
+         list_seqs = [ string for string in itertools.imap(''.join, itertools.product('ACDEFGHIKLMNPQRSTVWY', repeat=3)) ]
+     else:
+         with open(seqfile) as s:
+             lines = s.readlines()
+         seqs = [ l.strip() for l in lines ]
+         step = int(math.ceil(len(seqs)/float(interval)))
+         #list_seqs = [ seqs[start:start+step] for start in xrange(0, len(seqs), step) ]
+	 list_seqs = seqs
 
     for item in list_seqs:
         counter = counter+1
 
         if interval*(server_num-1) < counter <= interval*server_num:
-	    prefix = item
+	    if seqfile == "":
+                prefix = item
+            else:
+		prefix = item[0:3]
 	        
 	    #if this was already run 
 	    #does not test that _dat_complex is not empty (or 0)
-	    if test_complete and len(glob.glob("{outpath}{prefix}/{prefix}*_dat_complex".format(outpath=OUTPATH, prefix=prefix))) == 400:
+	    if test_complete and len(glob.glob("{outpath}{prefix}/{prefix}*_dat_complex".format(outpath=OUTPATH, prefix=prefix))) == 400 and len(glob.glob("{outpath}{prefix}/{prefix}*.txt".format(outpath=OUTPATH, prefix=prefix))) == 400 and len(glob.glob("{outpath}{prefix}/{prefix}*.pdb".format(outpath=OUTPATH, prefix=prefix))) == 0:
 	        continue
 	    
             try:
@@ -61,29 +73,32 @@ def main(server_num, queue_type, fen2, test_complete):
 	    except:
 		pass
 
+            copyfile(os.path.join(ROSETTA_DB, "scoring", "weights", "talaris2014.wts"), os.path.join(OUTPATH,prefix,"talaris2014.wts"))
+            copyfile(os.path.join(ROSETTA_DB, "scoring", "weights", "talaris2014_cst.wts"), os.path.join(OUTPATH,prefix,"talaris2014_cst.wts"))
+
 	    #generic command
-            command = "{s}/rosetta_amber_seq.sh {bin} {db} {inpath} {temppath} {outpath} {p} {home} {s} {torque}".format( bin=ROSETTA_BIN, db=ROSETTA_DB, temppath=TEMPPATH, outpath=OUTPATH, inpath=INPATH, p=prefix, s=SCRIPTS, home=home, torque='fen2' if fen2 else queue_type )
+            command = "{s}/rosetta_amber_seq.sh {bin} {db} {inpath} {temppath} {outpath} {p} {seq} {home} {s} {torque}".format( bin=ROSETTA_BIN, db=ROSETTA_DB, temppath=TEMPPATH, outpath=OUTPATH, inpath=INPATH, p=prefix, seq=item, s=SCRIPTS, home=home, torque='fen2' if fen2 else queue_type )
 	    
 	    #if slurm style, write script and run as a batch script
             if queue_type != "bash":
                 if queue_type == "slurm":
-                    script_fn = OUTPATH + prefix + '/' + prefix + "." + script_suff
+                    script_fn = OUTPATH + prefix + '/' + item + "." + script_suff
                 elif queue_type == "torque": 
                     job_count=int(math.ceil(counter/24.0))
                     script_fn = "{o}{c}.{suff}".format(o=OUTPATH, c=job_count, suff=script_suff)
 
 	        with open(script_fn, a_or_w) as script:
 		    if fen2:
-		        header = "#!/bin/bash\n#SBATCH -n 1\n#SBATCH -c 1\n#SBATCH --export=ALL\n#SBATCH --job-name={p}\n#SBATCH -p main\n#SBATCH -o {outpath}{p}/slurm{p}.out\n#SBATCH -t 60:00:00\n#SBATCH --mem=5500\n\n".format(p = prefix,outpath=OUTPATH)
+		        header = "#!/bin/bash\n#SBATCH -n 1\n#SBATCH -c 1\n#SBATCH --export=ALL\n#SBATCH --job-name={p}\n#SBATCH -p main\n#SBATCH -o {outpath}{p}/slurm{seq}.out\n#SBATCH -t 60:00:00\n#SBATCH --mem=5500\n#SBATCH --constraint=haswell\n\n".format(p = prefix, seq=item, outpath=OUTPATH)
 		    elif queue_type == "slurm":
-		        header = "#!/bin/bash\n#SBATCH -n 1\n#SBATCH -c 1\n#SBATCH --export=ALL\n#SBATCH --job-name={p}\n#SBATCH -o {outpath}{p}/slurm{p}.out\n\n".format(p = prefix, outpath=OUTPATH)
+		        header = "#!/bin/bash\n#SBATCH -n 1\n#SBATCH -c 1\n#SBATCH --export=ALL\n#SBATCH --job-name={p}\n#SBATCH -o {outpath}{p}/slurm{seq}.out\n\n".format(p = prefix, seq = item, outpath=OUTPATH)
                     elif queue_type == "torque": 
 			header = "#!/bin/bash\n#PBS -l nodes=1\n#PBS -l walltime=24:00:00\n#PBS -q tyr\n#PBS -N {c}\n#PBS -o {outpath}/{c}.out\n#PBS -e {outpath}/{c}.err\nsource ~/.bashrc\n\n".format(c = job_count, outpath=OUTPATH)
 		    
 		    #if queue_type is slurm or queue_type is torque and it's the first of 24 commands then write a header to the script
 		    if queue_type == "slurm" or counter % 24 == 1:
                         script.write(header)
-		    script.write(command + " > {outpath}{p}/{p}.log {bg}\n".format( outpath=OUTPATH, p=prefix, bg=background ))
+		    script.write(command + " &> {outpath}{p}/{seq}.log {bg}\n".format( outpath=OUTPATH, p=prefix, seq=item, bg=background ))
                     if queue_type == "slurm" or counter % 24 == 0 or counter == len(list_seqs):
                         if queue_type == "torque":
 			    script.write("\nwait\n")
@@ -91,7 +106,7 @@ def main(server_num, queue_type, fen2, test_complete):
 
 	    #if bash style, run as a process and wait at the end
 	    else:
-	        with open(OUTPATH + prefix + '/' + prefix + ".log", 'w') as file_out:
+	        with open(OUTPATH + prefix + '/' + item + ".log", 'w') as file_out:
             	    p = Popen("nohup nice " + command, stdout=file_out, shell=True)
                 ps.append(p)
         
@@ -109,6 +124,7 @@ if __name__ == "__main__":
     parser.add_argument ('--no-fen2', dest='fen2', action='store_false', help="is this being run on fen2. if yes, change some of sbatch headers")
     parser.add_argument ('--test-complete', dest='test_complete', action='store_true', help="should the folders be tested for the existence of 400 dat files.  Only set to true if sure that amber is running correctly.")
     parser.add_argument ('--no-test-complete', dest='test_complete', action='store_false', help="should the folders be tested for the existence of 400 dat files.  Only set to true if sure that amber is running correctly.")
+    parser.add_argument ('--seqfile', default="", help="optional. if included, gives path to seqfile if running in list mode is required.") 
     args = parser.parse_args()
 
     global OUTPATH
@@ -137,4 +153,4 @@ if __name__ == "__main__":
     ROSETTA_DB = home + "/Rosetta/main/database/"
     XML = home + main_path + "xml/"
 
-    main(args.server_num, args.queue_type, args.fen2, args.test_complete) 
+    main(args.server_num, args.queue_type, args.fen2, args.test_complete, args.seqfile) 
