@@ -1,6 +1,6 @@
 #!/bin/bash
 
-path=~/git_repos/deep_seq/analysis_vis/seq_lists_norm_counts11/
+path=~/git_repos/deep_seq/analysis_vis/seq_lists_norm_counts11_filtered/
 conversion_type=$1
 
 cd $path

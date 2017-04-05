@@ -1,0 +1,151 @@
+import os
+import sys
+import numpy as np
+import math
+from sklearn import metrics
+import matplotlib.pyplot as plt
+from pylab import *
+
+def binarizeList ( firstList ):
+    binary_freq = []
+
+    choose_val = 0.10
+
+    max_val = max(firstList)
+    if max_val < 0.10:
+        if max_val > 0.09:
+          choose_val = 0.09
+        elif max_val > 0.08:
+            choose_val = 0.08
+        elif max_val > 0.07:
+            choose_val = 0.07
+
+    for val in firstList:
+        if val > choose_val:
+            binary_freq.append( 1 )
+        else:
+            binary_freq.append( 0 )
+    return binary_freq
+
+def areaUnderCurve ( firstList, secondList ):
+    binary_freq = binarizeList( firstList )
+    fpr, tpr, _ = metrics.roc_curve(binary_freq, secondList)
+    auc = metrics.auc(fpr,tpr)
+    return auc
+
+def shannonEntropy( firstList ):
+    sE = -1.0 * np.sum( [ p * math.log(p,2) for p in firstList if p != 0.0 ] )
+    return sE
+
+def JSDivergence( firstList, secondList ):
+
+    firstSE = shannonEntropy( firstList )
+
+    secondSE = shannonEntropy( secondList )
+
+    combList = [ 0.5 * fL + 0.5 * sL for fL,sL in zip(firstList, secondList) ]
+
+    combSE = shannonEntropy( combList )
+
+    return combSE - 0.5 * firstSE - 0.5 * secondSE
+
+def cosineDist( firstList, secondList):
+
+    dotP = np.dot(firstList, secondList)
+
+    sqrt_1 = math.sqrt( np.sum( np.power( firstList,2 ) ) )
+    sqrt_2 = math.sqrt( np.sum( np.power( secondList,2 ) ) )
+
+    return dotP/(sqrt_1 * sqrt_2)
+
+def frobDist( firstList, secondList):
+
+    diff_lists = np.subtract(firstList,secondList)
+    terms = np.power( diff_lists,2)
+    return math.sqrt( np.sum( terms ) )
+
+def aveAbsDist( firstList, secondList ):
+
+    diff_lists = np.fabs( np.subtract( firstList, secondList) )
+    return sum( diff_lists ) / len( diff_lists )
+
+def readSpecProfileList( filename ):
+    with open(filename) as transfac_file:
+        transfac = transfac_file.readlines()
+
+    motifWidth = len(transfac)-2
+
+    aaAlpha = transfac[1].split()[1:]
+
+    freq = [{k: 0.0 for k in aaAlpha} for i in range(motifWidth)]
+
+    t_read = transfac[2:]
+
+    for pos,line in enumerate( t_read,0 ):
+        for aa_ind,f in enumerate( line.split()[1:], 0):
+            freq[pos][aaAlpha[aa_ind]] = float(f)
+
+    freqList = [ [ val for key,val in sorted(pos.iteritems()) ] for pos in freq ]
+
+    return freqList
+
+def main(args):
+    infile = args[1]
+    infile_expt = args[2]
+
+
+    expt = os.path.basename(infile_expt).rstrip()
+    expt = expt.rsplit('.',1)[0]
+
+    tokens=infile.rsplit('.',1)
+    file=tokens[0]
+
+    outfile= '%s_dist.txt' % (file)
+    outfile_heat= '%s_heat.png' % (file)
+
+    freq_in = readSpecProfileList( infile )
+    freq_expt = readSpecProfileList( infile_expt )
+    nda_freq_in = np.array( [ freq_in] )
+    nda_freq_expt = np.array( [ freq_expt] )
+    flat_freq_in = np.ndarray.flatten( nda_freq_in )
+    flat_freq_expt = np.ndarray.flatten( nda_freq_expt )
+
+    c = [ cosineDist( i, g ) for i,g in zip( freq_in, freq_expt ) ]
+    f = [ frobDist( i, g ) for i,g in zip( freq_in, freq_expt ) ]
+    a = [ aveAbsDist( i, g ) for i,g in zip( freq_in, freq_expt ) ]
+    jsd1 = [ JSDivergence ( i, g ) for i,g in zip( freq_in, freq_expt )] 
+    auc = [ areaUnderCurve ( i, g ) for i, g in zip( freq_expt, freq_in )]
+    avg_c = cosineDist( flat_freq_in, flat_freq_expt )
+    avg_f = frobDist( flat_freq_in, flat_freq_expt )
+    avg_a = aveAbsDist( flat_freq_in, flat_freq_expt )
+    avg_jsd = np.sum(jsd1) / len(jsd1)
+    avg_auc = np.sum(auc) / len(auc)
+
+    c.append(avg_c)
+    f.append(avg_f)
+    a.append(avg_a)
+    jsd1.append(avg_jsd)
+    auc.append(avg_auc)
+
+    dist_out = open(outfile,"w")
+
+    dist_out.write("Metric\t")
+    dist_out.write("\t".join([ "Col{0}".format(i) for i in xrange(1,len(c)) ]))
+    dist_out.write("\tAvg\nCosine\t")
+
+    dist_out.write("\t".join(map(str,c)))
+    dist_out.write("\nFrobenius\t")
+    dist_out.write("\t".join(map(str,f)))
+    dist_out.write("\nAAD\t")
+    dist_out.write("\t".join(map(str,a)))
+    dist_out.write("\nJSD\t")
+    dist_out.write("\t".join(map(str,jsd1)))
+    dist_out.write("\nAUC\t")
+    dist_out.write("\t".join(map(str,auc)))
+    dist_out.write("\n")
+
+    dist_out.close()
+
+if __name__ == "__main__":
+  main(sys.argv)
+

@@ -1,12 +1,21 @@
-function [V]  = main_svm(train, trainlab, test, boxconstraint, rbfsigma)
+function [labels, distances]  = main_svm(svmrbf, test_data)
  
-%clear test testlab ttcleaved to ts train trainlab a f X Y T AUC AUCav Std Performanceav Stdp atrain ftrain Xtrain Ytrain Ttrain AUCtrain AUCtrainav Stdtrain Performancetrainav Stdptrain
-    svmrbf =[];
-    
-    svmrbf=svmtrain(train, trainlab, 'kernel_function', 'rbf', 'boxconstraint', boxconstraint, 'rbf_sigma', rbfsigma);
- 
-%%TEST%%    
-    V = svmclassify(svmrbf,test);    
+    try
+        labels = svmclassify(svmrbf, test_data);
+
+        shift = svmrbf.ScaleData.shift;
+        scale = svmrbf.ScaleData.scaleFactor;
+        sv = svmrbf.SupportVectors;
+        alphaHat = svmrbf.Alpha;
+        bias = svmrbf.Bias;
+        kfun = svmrbf.KernelFunction;
+        kfunargs = svmrbf.KernelFunctionArgs;
+        test_scaled = ( test_data + shift ) .* scale;
+
+        distances = kfun(sv,test_scaled,kfunargs{:})'*alphaHat(:) + bias;
+    catch ME
+        warning(ME.message);
+    end  
 
                                    
 end
