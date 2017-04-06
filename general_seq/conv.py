@@ -16,7 +16,7 @@ def hamdist(str1, str2):
 def gen_hamdist_one(seq):
     aa_string = 'DEKRHNQYCGSTAMILVFWP'
 
-    return [ seq[0:ind] + char + seq[ind+1:] for ind in xrange(0,len(seq)) for char in aa_string ] 
+    return [ seq[0:ind] + char + seq[ind+1:] for ind in xrange(0,len(seq)) for char in aa_string if char != seq[ind] ] 
  
 
 def covar_MI(list_seqs, pos1, pos2):
