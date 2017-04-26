@@ -14,15 +14,15 @@ function [pred_labels, distances, X, Y, AUC]  = loop_test_data(train_name, test_
     formatSpecStringSeq = '%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%*f32,%s';
 
     train_file = fopen(train_name);
-    train_data_raw = textscan(train_file, formatSpec);
+    train_data_raw = textscan(train_file, formatSpecSeq);
     fclose(train_file);
-
+    
     train_file = fopen(train_name);
-    train_labels_raw = textscan(train_file, formatSpecString);
+    train_labels_raw = textscan(train_file, formatSpecStringSeq);
 
     train_labels = train_labels_raw{1,1};
     train_data = cell2mat(train_data_raw);
-
+    
     svmrbf=svmtrain(train_data, train_labels, 'kernel_function', 'rbf', 'boxconstraint', 1, 'rbf_sigma', 10);
     test_file = fopen(test_name);
 
@@ -49,7 +49,7 @@ function [pred_labels, distances, X, Y, AUC]  = loop_test_data(train_name, test_
     AUC = 0;
     
     if n_lines < 32000
-        test_data_raw = textscan(test_file, formatSpec);
+        test_data_raw = textscan(test_file, formatSpecSeq);
         test_data = cell2mat(test_data_raw);  
         [pred_labels, distances] = main_svm(svmrbf, test_data);
 
@@ -57,7 +57,7 @@ function [pred_labels, distances, X, Y, AUC]  = loop_test_data(train_name, test_
             fclose(test_file);
 
             test_file = fopen(test_name);
-            test_labels_raw = textscan(test_file, formatSpecString);
+            test_labels_raw = textscan(test_file, formatSpecStringSeq);
 
             test_labels = test_labels_raw{1,1};
             [X, Y, T, AUC] = perfcurve(test_labels, distances, 'CLEAVED');
@@ -65,7 +65,7 @@ function [pred_labels, distances, X, Y, AUC]  = loop_test_data(train_name, test_
         end
     else
         for i = 0:99
-            test_data_raw = textscan(test_file, formatSpecTest, 32000);
+            test_data_raw = textscan(test_file, formatSpecTestSeq, 32000);
             test_data = cell2mat(test_data_raw);
 
             start_ind = i*32000+1;

@@ -25,8 +25,8 @@ def main(list_nodes, output_prefix, metric):
     uncleaved_seq = { key : val for key, val in sequences.items() if val["type"] == "UNCLEAVED" }
 
     if metric == "metrics":
-        labels_non_plot = ["label", "fitness", "type", "canonical"]
-        labels_to_plot = sorted([ key for key in sequences["DEMEE"].keys() if key not in labels_non_plot ] + ["Fraction_Cleaved"])
+        labels_non_plot = ["label", "fitness", "type", "canonical", "timeset"]
+        labels_to_plot = sorted([ key for key in sequences["YNYIN"].keys() if key not in labels_non_plot ] + ["Fraction_Cleaved"])
     else:
 	labels_to_plot = [metric]
 
@@ -48,6 +48,7 @@ def main(list_nodes, output_prefix, metric):
 	else:
             data = [ get_data_from_dict(cleaved_seq, key), get_data_from_dict(middle_seq, key), get_data_from_dict(uncleaved_seq, key) ]
 	    normed = True
+	print key
         hist.draw_actual_plot(axarr[0,ind], data, "", key.capitalize(), log=log, normed=normed, label=["Cleaved", "Middle", "Uncleaved"], nbins=nbins)    
         axarr[0,ind].ticklabel_format(axis='x', style='sci', scilimits=(-2,2))
 

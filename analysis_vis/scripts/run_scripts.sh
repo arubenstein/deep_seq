@@ -56,3 +56,8 @@ python PlotMod.py --list_nodes results/graph_outputs/WT_nextseq_DEMEE_1_1-5_2_cl
 python PlotMetrics.py --list_nodes results/graph_outputs/WT_nextseq_DEMEE_1_1-5_2.csv --output_prefix results/graph_figures/WT_nextseq_DEMEE_1_1-5_2 --metric metrics
 
 python PromisPlotMetrics.py --list_nodes results/graph_outputs/WT_nextseq_DEMEE_1_1-5_2.csv "WT" --list_nodes results/graph_outputs/011_DEMEE_1_1-5_2.csv "011" --list_nodes results/graph_outputs/021_DEMEE_1_1-5_2.csv "021" --list_nodes results/graph_outputs/091_DEMEE_1_1-5_2.csv "091" --list_nodes results/graph_outputs/101_DEMEE_1_1-5_2.csv "101" --output_prefix results/graph_figures/variants --metric metrics
+
+
+awk -F, -v l=$label 'BEGIN{OFS=","}; {for (i=2; i<=NF; i++) printf $i","}{print "0,0,0,0",l}'  011_cleaved_sequence_features_binary.csv > 011_cleaved_structseq_binary.csv
+
+

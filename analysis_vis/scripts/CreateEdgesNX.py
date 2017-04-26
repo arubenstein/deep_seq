@@ -38,8 +38,7 @@ def main(list_sequence_names, hamming_dist, output_prefix, canonical_file):
         neighbors = conv.gen_hamdist_one(seq)
         edges_set.update([ (seq, n) for n in neighbors if n in dict_sequences ])
 	edges += [((seq, fitness, canonical_like), dict_sequences[n] ) for n in neighbors if n in dict_sequences and (n,seq) not in edges_set ]
-        print len(edges)
-	print len(edges_set)
+    
     print "Generated Edges: {0}".format(datetime.datetime.now())
     print edges[0:10]
     seq_id = { seq[0] : ind for ind, seq in enumerate(extended_list_sequences) } 
@@ -65,9 +64,10 @@ def main(list_sequence_names, hamming_dist, output_prefix, canonical_file):
 
     print "Generated List of Edges: {0}".format(datetime.datetime.now())
 
+    output = { "nodes" : nodes, "links" : links }
+
     with open('{0}nodes_edges.json'.format(output_prefix), 'w') as fp:
-        json.dump(nodes, fp)
-        json.dump(links, fp)
+        json.dump(output, fp)
 
     print "Dumped Nodes and Edges Lists: {0}".format(datetime.datetime.now())    
 
