@@ -60,4 +60,6 @@ python PromisPlotMetrics.py --list_nodes results/graph_outputs/WT_nextseq_DEMEE_
 
 awk -F, -v l=$label 'BEGIN{OFS=","}; {for (i=2; i<=NF; i++) printf $i","}{print "0,0,0,0",l}'  011_cleaved_sequence_features_binary.csv > 011_cleaved_structseq_binary.csv
 
+python FractionShellsRaw.py --sequence_list /Users/arubenstein/git_repos/deep_seq/analysis_vis/svm_results/cleaved_seqs_svm_structseq.list "CLEAVED" --sequence_list /Users/arubenstein/git_repos/deep_seq/analysis_vis/svm_results/uncleaved_seqs_svm_structseq.list "UNCLEAVED" --output_prefix /Users/arubenstein/git_repos/deep_seq/analysis_vis/results/fraction_shells
 
+python CreateEdgesNX.py --sequence_list ~/git_repos/deep_seq/analysis_vis/svm_results/cleaved_seqs_svm_structseq.txt "CLEAVED" --sequence_list ~/git_repos/deep_seq/analysis_vis/svm_results/uncleaved_seqs_svm_structseq.txt "UNCLEAVED" --hamming_dist 1 --output_prefix ~/git_repos/deep_seq/analysis_vis/results/graph_inputs/SVM_fullNX --canonical_file ""

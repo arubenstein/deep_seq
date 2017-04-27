@@ -65,18 +65,21 @@ def calc_epi_log(list_seqs, pos1, pos2, aa1, aa2):
     epi = math.log((p_both/(p1*p2)), 20)
     return epi 
 
-def adj_list(cleaved_set, uncleaved_set, middle_set, list_from):
+def adj_list(cleaved_set, uncleaved_set, middle_set, list_from, ignore_middle=False):
     neighbors = {} 
     for seq in list_from:
         neighbors_set = set(gen_hamdist_one(seq))
         cl_neighbors = neighbors_set.intersection(cleaved_set)
         uncl_neighbors = neighbors_set.intersection(uncleaved_set)
-        mid_neighbors = neighbors_set.intersection(middle_set)
+	if not ignore_middle:
+            mid_neighbors = neighbors_set.intersection(middle_set)
         neighbors[seq] = {}
         neighbors[seq]["CLEAVED"] = cl_neighbors
         neighbors[seq]["UNCLEAVED"] = uncl_neighbors
-        neighbors[seq]["MIDDLE"] = mid_neighbors
-    
+        if not ignore_middle: 
+            neighbors[seq]["MIDDLE"] = mid_neighbors
+    	else:
+	    neighbors[seq]["MIDDLE"] = []
     return neighbors 
 
 def fraction_neighbors_cleaved(cleaved_list, uncleaved_list, middle_list, list_from, test_existence=False):
@@ -97,10 +100,10 @@ def fraction_neighbors_cleaved(cleaved_list, uncleaved_list, middle_list, list_f
     return list_floats
 
 #this function should be used instead of the above one (fraction_neighbors_cleaved), leaving in the above one for legacy purposes
-def fraction_neighbors_all(cleaved_list, uncleaved_list, middle_list, list_from):
+def fraction_neighbors_all(cleaved_list, uncleaved_list, middle_list, list_from, ignore_middle=False):
     list_fracs = {}
 
-    neighbors = adj_list(set(cleaved_list),set(uncleaved_list),set(middle_list), list_from)
+    neighbors = adj_list(set(cleaved_list),set(uncleaved_list),set(middle_list), list_from, ignore_middle)
 
     for seq in list_from:
         cleaved_seqs = float(len(neighbors[seq]["CLEAVED"]))
