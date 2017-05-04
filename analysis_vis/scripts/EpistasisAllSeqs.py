@@ -2,10 +2,6 @@
 
 """Create edges and nodes from a list of sequences that are a given hamming distance apart"""
 import itertools
-import sys
-import operator
-import numpy
-from numpy import linalg as LA
 import argparse
 from general_seq import conv
 from general_seq import seq_IO
@@ -58,10 +54,12 @@ def main(list_sequence_names, output_prefix):
         list_sequences.append(sequences)
         extended_list_sequences.extend(sequences[:])
         labels.append(label)
+    
     print len(extended_list_sequences)
     dict_seq_fit = { seq : fitness for (seq, fitness, ratio) in extended_list_sequences }
     dict_seq_ratio = { seq : ratio for (seq, fitness, ratio) in extended_list_sequences }
     print len(dict_seq_fit)
+    
     epi = {}
     outfile_epi = '%s_epi_double.csv' % (output_prefix)
     epi_double_out = open(outfile_epi,"w")
@@ -73,10 +71,16 @@ def main(list_sequence_names, output_prefix):
 
     prod = itertools.product(list_sequences[labels.index("CLEAVED")], extended_list_sequences)
     pairs = set()
-
+    counter = 0
+    counter_prod = 0
     for x, y in prod:
+	counter_prod += 1
         if x[0] != y[0]:
+	   counter += 1
            pairs.add(frozenset((x, y)))
+    print counter_prod
+    print len(pairs)
+    print counter
     print "done making set"
     for can, seq_fit in pairs: 
 	canonical_seq = can[0]
