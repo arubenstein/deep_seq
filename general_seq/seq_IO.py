@@ -2,9 +2,10 @@
 
 """Convenience module to perform sequence IO"""
 import os
+from collections import defaultdict
 
 #todo - should this be a dict of additional params or something? and generally fix workflow not very solid decision tree
-def read_sequences( seqfile, additional_params=False, ind_type=None, header=False):
+def read_sequences( seqfile, additional_params=False, ind_type=None, header=False, create_keys=False, list_vals=False):
     """Reads list of sequences. If additional_params is set to True, reads each line as a list of sequence + additional parameters in that line."""
     with open(seqfile) as f:
         lines = f.read().splitlines()
@@ -27,9 +28,17 @@ def read_sequences( seqfile, additional_params=False, ind_type=None, header=Fals
             for ind,dtype in ind_type.items():
                 l[ind] = dtype(l[ind])
 
-        if header:
-	    sequence_dict = { l[0] : dict(zip(header_line[1:],l[1:])) for l in lines }
+        if header and create_keys:
+	    sequence_dict = { ind : dict(zip(header_line[1:],l[1:])) for l in lines }
 	    sequences = sequence_dict
+	elif header and list_vals:
+	    sequences = defaultdict(lambda: defaultdict(list))
+	    for ind, l in enumerate(lines):
+	        for head, stat in zip(header_line[1:],l[1:]):
+                    sequences[l[0]][head].append(stat)
+        elif header:
+            sequence_dict = { l[0] : dict(zip(header_line[1:],l[1:])) for ind,l in enumerate(lines) }
+            sequences = sequence_dict
 	else:
 	    sequences = [ tuple(l) for l in lines ]
     else:
