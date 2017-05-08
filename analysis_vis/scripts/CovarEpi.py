@@ -91,7 +91,8 @@ def main(sequence_file):
     fig2, axarr2 = pconv.create_ax(1, 1, shx=False, shy=False)
 
     ticks = [ i + 0.5 for i in np.arange(0,20) ]
-    aa_string = 'DEKRHNQYCGSTAMILVFWP'
+    #aa_string = 'DEKRHNQYCGSTAMILVFWP'
+    aa_string = 'ACDEFGHIKLMNPQRSTVWY'
     maxes = []
     mins = []
 
