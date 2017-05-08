@@ -19,15 +19,13 @@ def main(list_sequence_names, hamming_dist, output_prefix, canonical_file):
     #canonical_seqs = seq_IO.read_sequences(canonical_file)
     canonical_seqs = ["DEMEE"] #left other code here in case want to try it from all cleaved sequences
 
-    dict_sequences = {}
-
     for [filename, label] in list_sequence_names:
         sequences = seq_IO.read_sequences(filename, additional_params=True, ind_type={1:float})
         new_seqs = [ (seq,fitness,min([ conv.hamdist(seq,can) for can in canonical_seqs ]) <= 2) for seq,fitness in sequences ] 
         list_sequences.append(new_seqs)
 
         extended_list_sequences.extend(new_seqs[:])
-	dict_sequences.update({ n[0] : n for n in new_seqs })
+	dict_sequences = { n[0] : n for n in new_seqs }
         labels.append(label)
 
     edges = []

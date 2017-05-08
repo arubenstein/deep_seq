@@ -63,3 +63,9 @@ awk -F, -v l=$label 'BEGIN{OFS=","}; {for (i=2; i<=NF; i++) printf $i","}{print 
 python FractionShellsRaw.py --sequence_list /Users/arubenstein/git_repos/deep_seq/analysis_vis/svm_results/cleaved_seqs_svm_structseq.list "CLEAVED" --sequence_list /Users/arubenstein/git_repos/deep_seq/analysis_vis/svm_results/uncleaved_seqs_svm_structseq.list "UNCLEAVED" --output_prefix /Users/arubenstein/git_repos/deep_seq/analysis_vis/results/fraction_shells
 
 python CreateEdgesNX.py --sequence_list ~/git_repos/deep_seq/analysis_vis/svm_results/cleaved_seqs_svm_structseq.txt "CLEAVED" --sequence_list ~/git_repos/deep_seq/analysis_vis/svm_results/uncleaved_seqs_svm_structseq.txt "UNCLEAVED" --hamming_dist 1 --output_prefix ~/git_repos/deep_seq/analysis_vis/results/graph_inputs/SVM_fullNX --canonical_file ""
+
+python ShortestPaths.py --json_file ~/git_repos/deep_seq/analysis_vis/results/graph_inputs/SVM_fullNXcleaved_nodes_edges.json --output_prefix ~/git_repos/deep_seq/analysis_vis/results/shortest --source 'DEMEE' --target 'AEMIE'
+
+python FindNovelClusters.py --json_file ~/git_repos/deep_seq/analysis_vis/results/graph_inputs/SVM_full_cleaved_NXnodes_edges.json --nbunch_file ~/git_repos/deep_seq/analysis_vis/results/svm_cleavedcanonical_sim_cleaved_more_3.csv --output_prefix ~/git_repos/deep_seq/analysis_vis/results/svm_cleavedcanonical_sim_cleaved_more_3
+
+python FindSeqs.py --input_file ~/git_repos/deep_seq/analysis_vis/svm_results/cleaved_seqs_svm_structseq.txt --canonical_file ~/git_repos/deep_seq/analysis_vis/input/canonical_seqs.txt --output_prefix ~/git_repos/deep_seq/analysis_vis/results/svm_analysis/svm_cleaved --hamm_dist 2 --more_than 

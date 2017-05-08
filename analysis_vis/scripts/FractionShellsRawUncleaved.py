@@ -54,22 +54,22 @@ def main(list_sequence_names, output_prefix, index):
 
     start_ind = (index-1)*10000
     end_ind = (index)*10000
-    if start_ind > len(list_sequences[cleaved_ind]):
+    if start_ind > len(list_sequences[uncleaved_ind]):
         print "This index is not valid"
         exit
-    if end_ind > len(list_sequences[cleaved_ind]):
-        end_ind = len(list_sequences[cleaved_ind])
+    if end_ind > len(list_sequences[uncleaved_ind]):
+        end_ind = len(list_sequences[uncleaved_ind])
 
-    for seq in list_sequences[cleaved_ind][start_ind:end_ind]:
+    for seq in list_sequences[uncleaved_ind][start_ind:end_ind]:
 	new_neighbors = [seq]
 	fracs_per_seq[seq] = []
         for x in xrange(0,3):
             frac, new_neighbors = find_fraction_for_shell(new_neighbors, adj_list_cleaved, fracs_cleaved)
 	    fracs_per_seq[seq].append(frac)
 
-    print "Found Fracs for Cleaved Sequences at: {0}".format(datetime.datetime.now())    
+    print "Found Fracs for Uncleaved Sequences at: {0}".format(datetime.datetime.now())    
 
-    with open("{0}_cleaved_{1}.csv".format(output_prefix, index),'w') as f:
+    with open("{0}_uncleaved_{1}.csv".format(output_prefix, index),'w') as f:
         f.write("Sequence,1,2,3\n")
         f.write("".join([ "{0},{1},{2},{3}\n".format(k,str(v[0]),str(v[1]),str(v[2])) for k, v in fracs_per_seq.items() ]))
 

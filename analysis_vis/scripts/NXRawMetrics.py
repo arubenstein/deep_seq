@@ -7,8 +7,7 @@ import operator
 import argparse
 from general_seq import conv
 from general_seq import seq_IO
-from plot import conv as pconv
-from plot import hist
+import networkx
 from networkx.readwrite import json_graph
 import json
 
@@ -21,31 +20,18 @@ def main(json_file, output_prefix, metric):
 
     metrics = {}
 
-    #metrics["degree"] = degree(G)
-    metrics["closeness"] = closeness_centrality(G).values()
+    metrics["degree"] = networkx.degree(G)
+    #metrics["closeness"] = networkx.closeness_centrality(G).values()
     #TODO: add any other metrics here using a similar format to above line.
-    sequences = {}    	
-
-    cleaved_seq = { key : val for key, val in sequences.items() if val["type"] == "CLEAVED" }
 
     if metric != "metrics":
 	labels_to_plot = [metric]
     else:
 	labels_to_plot = metrics.keys()
-    n_to_plot = len(labels_to_plot)
-    fig, axarr = pconv.create_ax(n_to_plot, 1, shx=False, shy=False)
-
-    nbins = 20    
 
     for ind, key in enumerate(labels_to_plot):
-	normed = True
-        hist.draw_actual_plot(axarr[0,ind], metrics["key"], "", key.capitalize(), normed=normed, nbins=nbins)    
-        axarr[0,ind].ticklabel_format(axis='x', style='sci', scilimits=(-2,2))
-
-        #pconv.add_legend(axarr[0,ind], location="middle right")
-    pconv.save_fig(fig, output_prefix, "metrics", n_to_plot*5, 5, tight=True, size=12) 
-
-    
+        with open("{0}_{1}.txt".format(output_prefix, key), 'w') as o:
+            o.write("\n".join(metrics[key]))
 
 if __name__ == "__main__":
 

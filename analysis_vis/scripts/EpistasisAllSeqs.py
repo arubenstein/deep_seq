@@ -95,12 +95,12 @@ def main(list_sequence_names, output_prefix):
         if None not in list_fit:
             if dist == 2:
                 sum_fit = sum(list_fit)
-            if sum_fit > 1.95:
-                mut_dict["Both_Functional"].append((canonical_seq, seq, list_inter, list_fit))
-            elif sum_fit < 0.05:
-                mut_dict["Both_Nonfunctional"].append((canonical_seq, seq, list_inter, list_fit))
-            else: #either one uncleaved or one middle
-		mut_dict["One_Functional"].append((canonical_seq, seq, list_inter, list_fit))
+                if sum_fit > 1.95:
+                    mut_dict["Both_Functional"].append((canonical_seq, seq, list_inter, list_fit))
+                elif sum_fit < 0.05:
+                    mut_dict["Both_Nonfunctional"].append((canonical_seq, seq, list_inter, list_fit))
+                else: #either one uncleaved or one middle
+		    mut_dict["One_Functional"].append((canonical_seq, seq, list_inter, list_fit))
             epi[(canonical_seq,seq)] = (calc_epi(list_fit, fit),fit,list_fit,list_inter)
     print "done calc epi" 
     epi_double_out.write("Starting,Starting_Ratio,Ending,Ending_Ratio,Status_Ending,Status_Intermediates,Inter1_Seq,Inter1_Fit,Inter1_Ratio,Inter2_Seq,Inter2_Fit,Inter2_Ratio\n")
@@ -111,7 +111,7 @@ def main(list_sequence_names, output_prefix):
 					data = ",".join([ "{0},{1},{2}".format(seq,fitness_to_str(fit),dict_seq_ratio[seq]) for seq,fit in zip(list_inter,list_fit)])) )
     for label, list_muts in mut_nonfunc.items():
         for (can, seq, list_inter, list_fit) in list_muts:
-               epi_double_out.write("{start},{start_ratio},{end},{end_ratio},End_Uncleaved,{label},{data}\n".format(label=label,start=can,end=seq,
+            epi_double_out.write("{start},{start_ratio},{end},{end_ratio},End_Uncleaved,{label},{data}\n".format(label=label,start=can,end=seq,
                                         start_ratio=dict_seq_ratio[can],end_ratio=dict_seq_ratio[seq],
                                         data = ",".join([ "{0},{1},{2}".format(seq,fit,dict_seq_ratio[seq]) for seq,fit in zip(list_inter,list_fit)])) ) 
     epi_out.write("Starting,Starting_Ratio,Ending,Ending_Ratio,Ending_Fitness,Epistasis,List_Seqs_Fitnesses_Ratios_Intermediates\n")
