@@ -16,14 +16,15 @@ def find_intermediates(starting_seq, ending_seq):
 
 def get_inter_fitness(starting_seq, ending_seq, dict_fitnesses):
     list_inter = find_intermediates(starting_seq, ending_seq)
-    list_fit = [ dict_fitnesses.get(i) for i in list_inter ]
+    list_fit = [ np.random.choice([0,0.5,1], p=[0.48,0.28,0.24]) for i in list_inter ]
+    #list_fit = [ dict_fitnesses.get(i) for i in list_inter ]
     return list_inter, list_fit
 
 def calc_epi(list_fit, ending_fit):
     ind = sum([f - 1.0 for f in list_fit ])
     if ind < -1.0:
         ind = -1.0
-    elif ind > 1.0:
+    elif ind > 0.0:
         ind = 1.0
 
     epi = (ending_fit - 1.0) - ind 
@@ -103,7 +104,7 @@ def main(list_sequence_names, output_prefix):
 		    mut_dict["One_Functional"].append((canonical_seq, seq, list_inter, list_fit))
             epi[(canonical_seq,seq)] = (calc_epi(list_fit, fit),fit,list_fit,list_inter)
     print "done calc epi" 
-    epi_double_out.write("Starting,Starting_Ratio,Ending,Ending_Ratio,Status_Ending,Status_Intermediates,Inter1_Seq,Inter1_Fit,Inter1_Ratio,Inter2_Seq,Inter2_Fit,Inter2_Ratio\n")
+    '''epi_double_out.write("Starting,Starting_Ratio,Ending,Ending_Ratio,Status_Ending,Status_Intermediates,Inter1_Seq,Inter1_Fit,Inter1_Ratio,Inter2_Seq,Inter2_Fit,Inter2_Ratio\n")
     for label, list_muts in mut_func.items():
         for (can, seq, list_inter, list_fit) in list_muts:
             epi_double_out.write("{start},{start_ratio},{end},{end_ratio},End_Cleaved,{label},{data}\n".format(label=label,start=can,end=seq,
@@ -114,6 +115,7 @@ def main(list_sequence_names, output_prefix):
             epi_double_out.write("{start},{start_ratio},{end},{end_ratio},End_Uncleaved,{label},{data}\n".format(label=label,start=can,end=seq,
                                         start_ratio=dict_seq_ratio[can],end_ratio=dict_seq_ratio[seq],
                                         data = ",".join([ "{0},{1},{2}".format(seq,fit,dict_seq_ratio[seq]) for seq,fit in zip(list_inter,list_fit)])) ) 
+    '''
     epi_out.write("Starting,Starting_Ratio,Ending,Ending_Ratio,Ending_Fitness,Epistasis,List_Seqs_Fitnesses_Ratios_Intermediates\n")
     epi_out.write("\n".join(["{0},{1},{2},{3},{4},{5},{6}".format(can,dict_seq_ratio[can],seq,dict_seq_ratio[seq],fitness_to_str(fit),e,
 			",".join([ "{0},{1},{2}".format(s,fitness_to_str(f),dict_seq_ratio[s]) for f,s in zip(list_fit,list_inter)])) for (can,seq), (e,fit,list_fit,list_inter) in epi.items()] ) ) 
