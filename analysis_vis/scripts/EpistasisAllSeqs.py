@@ -5,6 +5,7 @@ import itertools
 import argparse
 from general_seq import conv
 from general_seq import seq_IO
+import numpy as np
 
 def find_intermediates(starting_seq, ending_seq):
     muts = [ (ch2, ch1!=ch2) for ch1, ch2 in zip(starting_seq, ending_seq) ]
