@@ -3,6 +3,7 @@
 """Convenience module to perform sequence IO"""
 import os
 from collections import defaultdict
+from itertools import groupby
 
 #todo - should this be a dict of additional params or something? and generally fix workflow not very solid decision tree
 def read_sequences( seqfile, additional_params=False, ind_type=None, header=False, create_keys=False, list_vals=False):
@@ -29,7 +30,7 @@ def read_sequences( seqfile, additional_params=False, ind_type=None, header=Fals
                 l[ind] = dtype(l[ind])
 
         if header and create_keys:
-	    sequence_dict = { ind : dict(zip(header_line[1:],l[1:])) for l in lines }
+	    sequence_dict = { ind : dict(zip(header_line[1:],l[1:])) for ind,l in enumerate(lines) }
 	    sequences = sequence_dict
 	elif header and list_vals:
 	    sequences = defaultdict(lambda: defaultdict(list))
@@ -37,7 +38,7 @@ def read_sequences( seqfile, additional_params=False, ind_type=None, header=Fals
 	        for head, stat in zip(header_line[1:],l[1:]):
                     sequences[l[0]][head].append(stat)
         elif header:
-            sequence_dict = { l[0] : dict(zip(header_line[1:],l[1:])) for ind,l in enumerate(lines) }
+            sequence_dict = { l[0] : dict(zip(header_line[1:],l[1:])) for l in lines }
             sequences = sequence_dict
 	else:
 	    sequences = [ tuple(l) for l in lines ]
@@ -74,3 +75,20 @@ def read_ratios(ratios_filename):
     c_sel = dict( (line.split()[1], float(line.split()[-1])) for line in lines if '*' not in line.split()[1] )
     return r, c_unsel, c_sel
 
+#not very robust, should do some error checking
+def fasta_iter(fasta_name):
+    """
+    given a fasta file. yield tuples of header, sequence
+    """
+    fh = open(fasta_name)
+    # ditch the boolean (x[0]) and just keep the header or sequence since
+    # we know they alternate.
+    faiter = (x[1] for x in groupby(fh, lambda line: line[0] == ">"))
+    seqs = []
+    for header in faiter:
+        # drop the ">"
+        header = header.next()[1:].strip()
+        # join all sequence lines to one. take out any gaps from the alignment
+        seq = "".join(s.strip().replace("-","") for s in faiter.next())
+	seqs.append((header, seq))
+    return seqs

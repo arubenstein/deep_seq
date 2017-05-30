@@ -17,7 +17,28 @@ def gen_hamdist_one(seq):
     aa_string = 'DEKRHNQYCGSTAMILVFWP'
 
     return [ seq[0:ind] + char + seq[ind+1:] for ind in xrange(0,len(seq)) for char in aa_string if char != seq[ind] ] 
- 
+
+def find_next_node(path, target, new_paths): 
+    source = path[-1]
+    if source == target:
+        return path
+    else:
+        next_nodes = [ source[0:ind] + char + source[ind+1:] for ind,char in enumerate(target) if char != source[ind] ]
+	paths = [ path + [n] for n in next_nodes ]
+	for p in paths:
+	     next_paths = find_next_node(p, target, new_paths)
+             if next_paths:
+	         new_paths.append(next_paths)
+
+def frac_paths(source, target, cleaved_set):
+    paths = []
+    find_next_node([source], target, paths) 
+    #inter_nodes_list = [ i for path in paths for i in path[1:-1] ]
+    #n_inter_nodes_cleaved = sum([1 for i in inter_nodes_list if i in cleaved_set])
+
+    unpassable = sum([1 for path in paths if any(p not in cleaved_set for p in path[1:-1]) ])
+
+    return float(unpassable)/len(paths)
 
 def covar_MI(list_seqs, pos1, pos2):
     e1 = calc_entropy(calc_probs(retrieve_freq_one_pos(list_seqs, pos1)))
