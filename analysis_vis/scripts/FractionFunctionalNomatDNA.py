@@ -48,7 +48,9 @@ def main(list_sequence_names, output_prefix, source):
     list_x = [0]
     list_y = [1/total]
 
-    new_neighbors = [source]
+    source_dna = dna_conv.rev_translate(source)
+
+    new_neighbors = source_dna
 
     for x in xrange(1,3):
         frac, new_neighbors = find_fraction_for_shell(new_neighbors, adj_list_cleaved, total)
