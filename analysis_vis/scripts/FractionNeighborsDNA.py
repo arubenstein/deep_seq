@@ -31,17 +31,22 @@ def main(list_sequence_names, output_prefix, source):
 
     total = float(len(cleaved_dna))
 
-    source_dna = dna_conv.rev_translate(source)
+    fracs = {}
 
-    neighbors_set = set.union(*[dna_conv.gen_hamdist_one(seq) for seq in source_dna])
-    cl_neighbors = neighbors_set.intersection(cleaved_dna)
+    for s in source:
 
+        source_dna = dna_conv.rev_translate(s)
+
+        neighbors_set = set.union(*[set(dna_conv.gen_hamdist_one(seq)) for seq in source_dna])
+        neighbors_nostop = set([ n for n in neighbors_set if '_' not in dna_conv.translate(n) ])
+        cl_neighbors = neighbors_set.intersection(cleaved_dna)
+
+        fracs[s] = (float(len(cl_neighbors))/len(neighbors_set), float(len(cl_neighbors))/len(neighbors_nostop))
+        
     print "Found Fracs for Cleaved Sequences at: {0}".format(datetime.datetime.now())    
 
-    print "Fracs are: {0}".format(float(len(cl_neighbors))/len(neighbors_set))
-
-#    with open("{0}_{1}.csv".format(output_prefix,source),'w') as f:
-#       f.write("\n".join([ "{0},{1}".format(str(x),str(y)) for x, y in zip(list_x,list_y) ]))
+    with open("{0}_frac_neighbors_dna.csv".format(output_prefix),'w') as f:
+       f.write("\n".join([ "{0},{1},{2}".format(s, str(frac1),str(frac2)) for s,(frac1,frac2) in fracs.items() ]))
 
 if __name__ == "__main__":
 
@@ -51,7 +56,7 @@ if __name__ == "__main__":
 
     parser.add_argument ('--output_prefix', help='output file prefix')
 
-    parser.add_argument ('--source', help='sequence to start from')
+    parser.add_argument ('--source', action='append', help='sequence to start from')
 
     args = parser.parse_args()
 
