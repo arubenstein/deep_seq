@@ -48,6 +48,7 @@
 <input_filename_map_counts>dummy1.fast_R1_PRO_qc,dummy1.fast_R1_DNA_qc</input_filename_map_counts>
 <sel_filename_map_counts>dummy2.fast_R1_PRO_qc,dummy2.fast_R1_DNA_qc</sel_filename_map_counts>
 <counts_threshold>COUNTS_THRESHOLD</counts_threshold>
+<counts_norm>COUNTS_NORM</counts_norm>
 </map_counts>
 <map_ratios section="TRUE">
 <input_filename_map_ratios>counts_dummy1.fast_R1_PRO_qc,counts_dummy1.fast_R1_DNA_qc</input_filename_map_ratios>

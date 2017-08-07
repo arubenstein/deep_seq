@@ -8,7 +8,6 @@ The map_ratios module also uses a two-sided Possion exact test using the R poiss
 import sys, time, math, os, optparse #import general libraries
 import enrich_util #import project-specific libraries
 
-
 __author__ = "Douglas M. Fowler"
 __copyright__ = "Copyright 2011"
 __credits__ = ["Douglas M Fowler", "Carlos L. Araya"]
@@ -62,6 +61,119 @@ def twotail_ptest(x, T, r, debug_flag=False):
     except:
         return float('NaN')
 
+def translate(DNA_seq):
+    codon_table = {'TTT':'F', 'TCT':'S', 'TAT':'Y', 'TGT':'C',
+    'TTC':'F', 'TCC':'S', 'TAC':'Y', 'TGC':'C',
+    'TTA':'L', 'TCA':'S', 'TAA':'*', 'TGA':'*',
+    'TTG':'L', 'TCG':'S', 'TAG':'*', 'TGG':'W',
+    'CTT':'L', 'CCT':'P', 'CAT':'H', 'CGT':'R',
+    'CTC':'L', 'CCC':'P', 'CAC':'H', 'CGC':'R',
+    'CTA':'L', 'CCA':'P', 'CAA':'Q', 'CGA':'R',
+    'CTG':'L', 'CCG':'P', 'CAG':'Q', 'CGG':'R',
+    'ATT':'I', 'ACT':'T', 'AAT':'N', 'AGT':'S',
+    'ATC':'I', 'ACC':'T', 'AAC':'N', 'AGC':'S',
+    'ATA':'I', 'ACA':'T', 'AAA':'K', 'AGA':'R',
+    'ATG':'M', 'ACG':'T', 'AAG':'K', 'AGG':'R',
+    'GTT':'V', 'GCT':'A', 'GAT':'D', 'GGT':'G',
+    'GTC':'V', 'GCC':'A', 'GAC':'D', 'GGC':'G',
+    'GTA':'V', 'GCA':'A', 'GAA':'E', 'GGA':'G',
+    'GTG':'V', 'GCG':'A', 'GAG':'E', 'GGG':'G'}
+
+    AA_seq = ""
+    if len(DNA_seq) % 3 == 0:
+        for i in xrange(0, len(DNA_seq), 3):
+            codon = codon_table[DNA_seq[i:i+3]]
+            if codon == "*":
+               AA_seq = ""
+               break
+            AA_seq = AA_seq + codon
+
+    return AA_seq
+
+def DNA_prot_avg_ratio(input_A_file, input_B_file, path):
+    norm_A_dict = enrich_util.build_value_dict(path + 'data/output/' + input_A_file, 1, 7, "float")
+    norm_B_dict = enrich_util.build_value_dict(path + 'data/output/' + input_B_file, 1, 7, "float")
+
+    seq_seqID_A_dict = enrich_util.build_value_dict(path + 'data/output/' + input_A_file, 1, 0, "str")
+
+    ratio_dict = enrich_util.gen_ratio_dict(norm_A_dict, norm_B_dict)
+
+    cnt = {}
+    tally_seqs = {}
+    rev_trans = {}
+
+    for seq, ratio in ratio_dict.items():
+        AA_seq = translate(seq)
+        if AA_seq:
+	    if cnt.get(AA_seq) is None:
+                cnt[AA_seq] = 0.0
+                tally_seqs[AA_seq] = 0
+            cnt[AA_seq] += ratio
+	    tally_seqs[AA_seq] += 1
+            rev_trans[AA_seq] = seq_seqID_A_dict[seq]
+
+    return dict( ( AA_seq , ratio/tally_seqs[AA_seq] ) for AA_seq, ratio in cnt.items() ), rev_trans
+
+def output_stats(ratio_dict, poisson_dict, fdr_dict, bonferroni, input_A_file, input_B_file, input_dict, count_A_dict, count_B_dict, path, avg_dict = None):
+
+    if avg_dict is not None:
+        prefix = "avg_"
+    else:
+        prefix = ""
+
+    #print to file the sequences, ratios and other data 
+    f = open(path + 'data/output/' + prefix + 'ratios_' + input_A_file.split('counts_')[1] + '_' + input_B_file.split('counts_')[1], 'w')
+    f_1 = open(path + 'data/output/' + prefix + 'ratios_' + input_A_file.split('counts_')[1] + '_' + input_B_file.split('counts_')[1] + '.m1', 'w')
+    f_2 = open(path + 'data/output/' + prefix + 'ratios_' + input_A_file.split('counts_')[1] + '_' + input_B_file.split('counts_')[1] + '.m2', 'w')
+
+    print >>f, '\t'.join(["seqID","sequence","match_count","mutation_count","mutation_location","mutation_identity","max_mutation_run","log2_ratio", "fractional_fitness", "fractional_wt", "pval", "bonferroni", "qval", "count_unsel", "count_sel"])
+    print >>f_1, '\t'.join(["seqID","sequence","match_count","mutation_count","mutation_location","mutation_identity","max_mutation_run","log2_ratio", "fractional_fitness", "fractional_wt", "pval", "bonferroni", "qval", "count_unsel", "count_sel"])
+    print >>f_2, '\t'.join(["seqID","sequence","match_count","mutation_count","mutation_location","mutation_identity","max_mutation_run","log2_ratio", "fractional_fitness", "fractional_wt", "pval", "bonferroni", "qval", "count_unsel", "count_sel"])
+    
+    seqIDs = enrich_util.valuesort(ratio_dict)
+    seqIDs.reverse()
+    maxRatio = ratio_dict[seqIDs[0]]
+    
+    try:
+        wtRatio = ratio_dict['NA-NA']
+        
+    except:
+        print 'WT not found, setting WT ratio = 1'
+        wtRatio = 1
+        
+    for seqID in seqIDs:
+        poisson = poisson_dict.get(seqID, -1)
+        fdr = fdr_dict.get(seqID, -1)
+
+        try:
+            bf = poisson*bonferroni
+            if bf > 1: #make sure Bonferroni pvalues do not exceed 1
+                bf = 1
+                
+        except:
+            bf = 'NA'
+
+        if avg_dict is not None:
+            inp = input_dict[avg_dict[seqID]][:6]
+	    rev_seqID = avg_dict[seqID]
+        else:
+            inp = input_dict[seqID][:6]
+	    rev_seqID = seqID
+            
+        print >>f, '\t'.join([seqID] + map(str, inp + [math.log(float(ratio_dict[seqID]),2), float(ratio_dict[seqID])/maxRatio, float(ratio_dict[seqID])/wtRatio] + [poisson, bf, fdr, count_B_dict[rev_seqID], count_A_dict[rev_seqID] ]))
+        
+        if inp[2] == '1':
+            print >>f_1, '\t'.join([seqID] + map(str, inp + [math.log(float(ratio_dict[seqID]),2), float(ratio_dict[seqID])/maxRatio, float(ratio_dict[seqID])/wtRatio] + [poisson, bf, fdr, count_B_dict[rev_seqID], count_A_dict[rev_seqID] ]))
+            
+        if inp[2] == '2':
+            print >>f_2, '\t'.join([seqID] + map(str, inp + [math.log(float(ratio_dict[seqID]),2), float(ratio_dict[seqID])/maxRatio, float(ratio_dict[seqID])/wtRatio] + [poisson, bf, fdr, count_B_dict[rev_seqID], count_A_dict[rev_seqID] ]))
+            
+    f.close()
+    f_1.close()
+    f_2.close()
+    
+    return(0)
+
 def main(path, infile1, infile2, grid = 'L'):
     input_A_file = infile1
     input_B_file = infile2
@@ -78,9 +190,10 @@ def main(path, infile1, infile2, grid = 'L'):
         #build a dictionary of the sequences and counts:
         norm_A_dict = enrich_util.build_value_dict(path + 'data/output/' + input_A_file, 0, 7, "float")
         norm_B_dict = enrich_util.build_value_dict(path + 'data/output/' + input_B_file, 0, 7, "float")
-        
-        count_A_dict = enrich_util.build_value_dict(path + 'data/output/' + input_A_file, 0, 8, "int")
-        count_B_dict = enrich_util.build_value_dict(path + 'data/output/' + input_B_file, 0, 8, "int")
+
+        #8/24/16 changed input type from int to float 
+        count_A_dict = enrich_util.build_value_dict(path + 'data/output/' + input_A_file, 0, 8, "float")
+        count_B_dict = enrich_util.build_value_dict(path + 'data/output/' + input_B_file, 0, 8, "float")
     
     except:
         print 'Error: failed to open input file(s)'
@@ -125,50 +238,12 @@ def main(path, infile1, infile2, grid = 'L'):
 
     bonferroni = len(poisson_dict) #calculate the Bonferroni correction factor
     
-    #print to file the sequences, ratios and other data 
-    f = open(path + 'data/output/' + 'ratios_' + input_A_file.split('counts_')[1] + '_' + input_B_file.split('counts_')[1], 'w')
-    f_1 = open(path + 'data/output/' + 'ratios_' + input_A_file.split('counts_')[1] + '_' + input_B_file.split('counts_')[1] + '.m1', 'w')
-    f_2 = open(path + 'data/output/' + 'ratios_' + input_A_file.split('counts_')[1] + '_' + input_B_file.split('counts_')[1] + '.m2', 'w')
+    output_stats(ratio_dict, poisson_dict, fdr_dict, bonferroni, input_A_file, input_B_file, input_dict, count_A_dict, count_B_dict, path, avg_dict = None)
 
-    print >>f, '\t'.join(["seqID","sequence","match_count","mutation_count","mutation_location","mutation_identity","max_mutation_run","log2_ratio", "fractional_fitness", "fractional_wt", "pval", "bonferroni", "qval", "count_unsel", "count_sel"])
-    print >>f_1, '\t'.join(["seqID","sequence","match_count","mutation_count","mutation_location","mutation_identity","max_mutation_run","log2_ratio", "fractional_fitness", "fractional_wt", "pval", "bonferroni", "qval", "count_unsel", "count_sel"])
-    print >>f_2, '\t'.join(["seqID","sequence","match_count","mutation_count","mutation_location","mutation_identity","max_mutation_run","log2_ratio", "fractional_fitness", "fractional_wt", "pval", "bonferroni", "qval", "count_unsel", "count_sel"])
-    
-    seqIDs = enrich_util.valuesort(ratio_dict)
-    seqIDs.reverse()
-    maxRatio = ratio_dict[seqIDs[0]]
-    
-    try:
-        wtRatio = ratio_dict['NA-NA']
-        
-    except:
-        print 'WT not found, setting WT ratio = 1'
-        wtRatio = 1
-        
-    for seqID in seqIDs:
-        poisson = poisson_dict[seqID]
-        fdr = fdr_dict[seqID]
-
-        try:
-            bf = poisson*bonferroni
-            if bf > 1: #make sure Bonferroni pvalues do not exceed 1
-                bf = 1
-                
-        except:
-            bf = 'NA'
-            
-        print >>f, '\t'.join([seqID] + map(str, input_dict[seqID][:6] + [math.log(float(ratio_dict[seqID]),2), float(ratio_dict[seqID])/maxRatio, float(ratio_dict[seqID])/wtRatio] + [poisson, bf, fdr, count_B_dict[seqID], count_A_dict[seqID] ]))
-        
-        if input_dict[seqID][2] == '1':
-            print >>f_1, '\t'.join([seqID] + map(str, input_dict[seqID][:6] + [math.log(float(ratio_dict[seqID]),2), float(ratio_dict[seqID])/maxRatio, float(ratio_dict[seqID])/wtRatio] + [poisson, bf, fdr, count_B_dict[seqID], count_A_dict[seqID] ]))
-            
-        if input_dict[seqID][2] == '2':
-            print >>f_2, '\t'.join([seqID] + map(str, input_dict[seqID][:6] + [math.log(float(ratio_dict[seqID]),2), float(ratio_dict[seqID])/maxRatio, float(ratio_dict[seqID])/wtRatio] + [poisson, bf, fdr, count_B_dict[seqID], count_A_dict[seqID] ]))
-            
-    f.close()
-    f_1.close()
-    f_2.close()
-    
+    if "DNA" in input_A_file:
+        ratio_dict, avg_dict = DNA_prot_avg_ratio(input_A_file, input_B_file, path)
+        output_stats(ratio_dict, {}, {}, 0, input_A_file, input_B_file, input_dict, count_A_dict, count_B_dict, path, avg_dict = avg_dict)
+ 
     return(0)
     
 if __name__ == '__main__':

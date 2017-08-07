@@ -514,12 +514,12 @@ def counts(cfg_data_flattened, args=[]):
     
     if cfg_data_flattened['local'] == 'L':
         if cfg_data_flattened['input_read1_filename'] != 'NONE' or cfg_data_flattened['input_read2_filename'] != 'NONE':
-            retcodes.append(map_counts.main(cfg_data_flattened['path'], input_files[0], cfg_data_flattened['local'], int(cfg_data_flattened['counts_threshold']))) #call map_counts
-            retcodes.append(map_counts.main(cfg_data_flattened['path'], input_files[1], cfg_data_flattened['local'], int(cfg_data_flattened['counts_threshold']))) #call map_counts
+            retcodes.append(map_counts.main(cfg_data_flattened['path'], input_files[0], cfg_data_flattened['local'], int(cfg_data_flattened['counts_threshold']), int(cfg_data_flattened['counts_norm']))) #call map_counts
+            retcodes.append(map_counts.main(cfg_data_flattened['path'], input_files[1], cfg_data_flattened['local'], int(cfg_data_flattened['counts_threshold']), int(cfg_data_flattened['counts_norm']))) #call map_counts
         
         if cfg_data_flattened['sel_read1_filename'] != 'NONE' or cfg_data_flattened['sel_read2_filename'] != 'NONE':
-            retcodes.append(map_counts.main(cfg_data_flattened['path'], sel_files[0], cfg_data_flattened['local'], int(cfg_data_flattened['counts_threshold']))) #call map_counts
-            retcodes.append(map_counts.main(cfg_data_flattened['path'], sel_files[1], cfg_data_flattened['local'], int(cfg_data_flattened['counts_threshold']))) #call map_counts
+            retcodes.append(map_counts.main(cfg_data_flattened['path'], sel_files[0], cfg_data_flattened['local'], int(cfg_data_flattened['counts_threshold']), int(cfg_data_flattened['counts_norm']))) #call map_counts
+            retcodes.append(map_counts.main(cfg_data_flattened['path'], sel_files[1], cfg_data_flattened['local'], int(cfg_data_flattened['counts_threshold']), int(cfg_data_flattened['counts_norm']))) #call map_counts
 
     elif cfg_data_flattened['local']  == 'SGE':
         try:

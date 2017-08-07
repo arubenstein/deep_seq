@@ -36,6 +36,9 @@ fi
 
 if [[ $enrich -eq 1 ]]
 then
+    max_seq=$(wc -l "$OUTPATH"/pre_enrich/*_cut.fastq | awk '{print $1}' | head -n -1 | sort -n | tail -n 1)
+    export COUNTS_NORM=$(( max_seq / 4 ))
+    print $COUNTS_NORM
     if [[ $threshold == "all" ]]
     then
         for i in `seq 1 30`
@@ -44,7 +47,7 @@ then
             $SCRIPTS'/'postprocess.sh $OUTPATH'/enrich/'$i'/' &	
         done
     else
-        $SCRIPTS'/'loop_pdbs.sh $OUTPATH'/pre_enrich/Sample*_cut.fastq' $OUTPATH'/enrich/'$threshold'/' $SCRIPTS'/run_enrich.sh' 1 1 1 $threshold
+        $SCRIPTS'/'loop_pdbs.sh $OUTPATH'/pre_enrich/MP*_cut.fastq' $OUTPATH'/enrich/'$threshold'/' $SCRIPTS'/run_enrich.sh' 1 1 1 $threshold
         #$SCRIPTS'/'postprocess.sh $OUTPATH'/enrich/'$threshold'/'  &
     fi
 fi

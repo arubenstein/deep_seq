@@ -110,7 +110,11 @@ def main(path, infile, referenceDNA, referenceAA, gap_max, unresolvable_max, max
                         read.AAmutation_count = read.AAmutation_count + 1
                         read.AAmutation_location.append(i)
                         read.AAmutation_identity.append(read.AAsequence[i]) 
-                
+
+		#ignore stop codons added 8/24/16
+	        if "*" in read.AA_sequence:
+                    continue        
+ 
                 if read.DNAmutation_count == 0:
                     read.DNAmutation_location = 'NA'
                     read.DNAmutation_identity = 'NA'
