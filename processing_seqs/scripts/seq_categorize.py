@@ -4,6 +4,7 @@ import glob
 import os
 import sys
 import argparse
+import math
 
 def read_freqs(counts_filename):
     with open(counts_filename) as f:
@@ -46,16 +47,25 @@ def categorize(list_val_tuples_cleaved, list_val_tuples_uncleaved, list_val_tupl
         categories_dict["Uncleaved"] = ""
         categories_dict["Middle"] = ""
         categories_dict["Cleaved"] = ""
-
-        for sample, x in list_val_tuples_uncleaved.items():
-            if x[0] > 0:
-                categories_dict["Uncleaved"] = categories_dict["Uncleaved"] + (sample)
-        for sample, x in list_val_tuples_cleaved.items():
-            if x[0] > 0:
-                categories_dict["Cleaved"] = categories_dict["Cleaved"] + (sample)
-        for sample, x in list_val_tuples_middle.items():
-            if x[0] > 0:
-                categories_dict["Middle"] = categories_dict["Middle"] + (sample)  
+	if sum([ 1 for l in [list_val_tuples_cleaved, list_val_tuples_uncleaved, list_val_tuples_middle] if any(not math.isnan(x[0]) for x in l.values()) ]) == 1:
+            for sample, x in list_val_tuples_uncleaved.items():
+                if x[0] < 0:
+	            categories_dict["Uncleaved"] = ""
+                    break
+                elif x[0] > 2.0:
+                    categories_dict["Uncleaved"] = categories_dict["Uncleaved"] + (sample)
+            for sample, x in list_val_tuples_cleaved.items():
+                if x[0] < 0:
+                    categories_dict["Cleaved"] = ""
+                    break
+                elif x[0] > 2.0:                
+	            categories_dict["Cleaved"] = categories_dict["Cleaved"] + (sample)
+            for sample, x in list_val_tuples_middle.items():
+                if x[0] < 0:
+                    categories_dict["Middle"] = ""
+                    break
+                elif x[0] > 2.0:
+                    categories_dict["Middle"] = categories_dict["Middle"] + (sample)  
      
     if categories_dict.get("Cleaved and Uncleaved") is None:
         if any(x[0] > 0 for x in list_val_tuples_cleaved.values()) and any(x[0] < 0 for x in list_val_tuples_uncleaved.values()):
@@ -101,15 +111,14 @@ def process_dir(initial_dir, output_file, datatype):
                     seq_values[seq][sample] = (ratio, c_unsel[seq], c_sel[seq])
 
         for seq, seq_dict in seq_values.items():
-            uncleaved_dict = { sample_name : seq_dict.get(sample_name,(0,0,0)) for sample_name in sample_names["Uncleaved"] }
-            cleaved_dict = { sample_name : seq_dict.get(sample_name,(0,0,0)) for sample_name in sample_names["Cleaved"] }
-            middle_dict = { sample_name : seq_dict.get(sample_name,(0,0,0)) for sample_name in sample_names["Middle"] }
+            uncleaved_dict = { sample_name : seq_dict.get(sample_name,(float('NaN'),0,0)) for sample_name in sample_names["Uncleaved"] }
+            cleaved_dict = { sample_name : seq_dict.get(sample_name,(float('NaN'),0,0)) for sample_name in sample_names["Cleaved"] }
+            middle_dict = { sample_name : seq_dict.get(sample_name,(float('NaN'),0,0)) for sample_name in sample_names["Middle"] }
 
             seq_values[seq].update(categorize(cleaved_dict, uncleaved_dict, middle_dict))
 
         with open(output_file + "_" + seq_name + ".csv", 'w') as o:
             s_list = [ s for item in sample_names.values() for s in item ]
-            print s_list
             c_list = ["Cleaved and Uncleaved","Cleaved and Middle", "Uncleaved and Middle", "Uncleaved", "Cleaved", "Middle",
                                 "Cleaved Not Uncleaved", "Uncleaved Not Cleaved"]
             o.write(','.join(["Sequence"] + [ "{0}-{1},{2},{3}".format(s,"Ratio","Unsel","Sel") for s in s_list ] + c_list ))
