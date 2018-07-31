@@ -14,7 +14,7 @@ ls ''$pattern'' > $actual_fn'_files_list.txt'
 
 cat $(grep -v '^#' $actual_fn'_files_list.txt' ) > $outpath'/'$actual_fn'.fasta'
 
-python $SCRIPTS'/cut_c.py' $outpath'/'$actual_fn'.fasta'
+python $SCRIPTS'/cut_c.py' --infile $outpath'/'$actual_fn'.fasta' --outpath $outpath
 
 perl $SCRIPTS'/fasta2FakeFastq.pl' $outpath'/'$actual_fn'_cut.fasta' > $outpath'/'$actual_fn'_cut.fastq'
 

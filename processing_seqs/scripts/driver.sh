@@ -23,10 +23,9 @@ then
 		#1. split_fasta
 		$SCRIPTS'/'loop_pdbs.sh $INPATH'/fasta/miseq/*.fasta' $OUTPATH'/'split_fasta $SCRIPTS'/split_fasta.sh' 1 1 1
 
-
 		#2. seq_orient.pl
 		$SCRIPTS'/'loop_pdbs.sh $OUTPATH'/split_fasta/*.fsa' $OUTPATH'/orient/' $SCRIPTS'/orient.sh' 1 1 1
-
+		
 		#3. orient_to_enrich.sh
 		$SCRIPTS'/'loop_pdbs.sh $OUTPATH'/orient/*/' $OUTPATH'/pre_enrich/' $SCRIPTS'/orient_to_enrich.sh' 1 1 1 
 	else
@@ -44,7 +43,7 @@ then
             $SCRIPTS'/'postprocess.sh $OUTPATH'/enrich/'$i'/' &	
         done
     else
-        $SCRIPTS'/'loop_pdbs.sh $OUTPATH'/pre_enrich/Sample*_cut.fastq' $OUTPATH'/enrich/'$threshold'/' $SCRIPTS'/run_enrich.sh' 1 1 1 $threshold
+        $SCRIPTS'/'loop_pdbs.sh $OUTPATH'/pre_enrich/MP*Q20*_cut.fastq' $OUTPATH'/enrich/'$threshold'/' $SCRIPTS'/run_enrich.sh' 1 1 1 $threshold
         #$SCRIPTS'/'postprocess.sh $OUTPATH'/enrich/'$threshold'/'  &
     fi
 fi
