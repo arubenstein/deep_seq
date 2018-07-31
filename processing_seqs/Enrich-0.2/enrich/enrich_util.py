@@ -19,7 +19,7 @@ def valuesort(input_dict):
     backitems.sort()
     return [ backitems[i][1] for i in range(0,len(backitems)) ]
     
-def build_tally_dict(input_file, counts_threshold=1):
+def build_tally_dict(input_file, counts_threshold=1, counts_norm=-1):
     '''define a function to build a tally of sequences observed from filtered reads'''
     properties_dict = {}
     tally_dict = {}
@@ -40,11 +40,19 @@ def build_tally_dict(input_file, counts_threshold=1):
 
     filt_tally_dict = {}
     filt_properties_dict = {}   
+
+    #8/24/16 added this line to normalize counts
+    if counts_norm != -1:
+	total = sum( [ tally for mutation_location_dict in tally_dict.values() for tally in mutation_location_dict.values() ] )
+        factor = counts_norm/float(total)
+        for mutation_location, mutation_location_dict in tally_dict.items():
+            tally_dict[mutation_location] = dict( (mutation_identity, tally*factor ) for mutation_identity, tally in mutation_location_dict.items() )
+
     #6/3/16 added this line
     for mutation_location, mutation_location_dict in tally_dict.items():
 	filt_tally_dict[mutation_location] = dict( (mutation_identity, tally ) for mutation_identity, tally in mutation_location_dict.items() if tally >= counts_threshold )
 	filt_properties_dict[mutation_location] = dict( (mutation_identity, val ) for mutation_identity, val in properties_dict[mutation_location].items() if mutation_identity in filt_tally_dict[mutation_location])
-    
+
     return filt_tally_dict, filt_properties_dict
 
 def norm_count_dict(count_dict):

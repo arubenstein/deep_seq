@@ -16,43 +16,49 @@ def get_data_from_dict( sequence_dict, label ):
     return [ val[label] for key, val in sequence_dict.items() ]
 
 
-def main(list_nodes, output_prefix, metric):
+def main(list_nodes, output_prefix, metric, create_keys=False):
     
-    sequences = seq_IO.read_sequences(list_nodes, additional_params=True, header=True)
+    if not create_keys:
+        sequences = seq_IO.read_sequences(list_nodes, additional_params=True, header=True)
+    else:
+        sequences = seq_IO.read_sequences(list_nodes, additional_params=True, header=True, create_keys=True)
 
     cleaved_seq = { key : val for key, val in sequences.items() if val["type"] == "CLEAVED" }
     middle_seq = { key : val for key, val in sequences.items() if val["type"] == "MIDDLE" }
     uncleaved_seq = { key : val for key, val in sequences.items() if val["type"] == "UNCLEAVED" }
 
+    print len(cleaved_seq) 
     if metric == "metrics":
-        labels_non_plot = ["label", "fitness", "type", "canonical"]
-        labels_to_plot = sorted([ key for key in sequences["DEMEE"].keys() if key not in labels_non_plot ] + ["Fraction_Cleaved"])
+        labels_non_plot = ["label", "fitness", "type", "canonical", "timeset"]
+        #labels_to_plot = sorted([ key for key in sequences["YNYIN"].keys() if key not in labels_non_plot ] + ["Fraction_Cleaved"])
+        labels_to_plot = sorted([ key for key in sequences["YNYIN"].keys() if key not in labels_non_plot ])
     else:
 	labels_to_plot = [metric]
 
     n_to_plot = len(labels_to_plot)
     fig, axarr = pconv.create_ax(n_to_plot, 1, shx=False, shy=False)
 
-    nbins = 20    
+    nbins = 10    
 
     for ind, key in enumerate(labels_to_plot):
 	if key == "pageranks":
-            log = True
+            log = True 
 	else:
 	    log = False
 	if key == "Fraction_Cleaved":
-            data = [ conv.fraction_neighbors_cleaved(cleaved_seq.keys(), uncleaved_seq.keys(), middle_seq.keys(), cleaved_seq.keys()).values(),
-		     conv.fraction_neighbors_cleaved(cleaved_seq.keys(), uncleaved_seq.keys(), middle_seq.keys(), middle_seq.keys()).values(),
-                     conv.fraction_neighbors_cleaved(cleaved_seq.keys(), uncleaved_seq.keys(), middle_seq.keys(), uncleaved_seq.keys()).values()]
+           # data = [ conv.fraction_neighbors_cleaved(cleaved_seq.keys(), uncleaved_seq.keys(), middle_seq.keys(), cleaved_seq.keys()).values(),
+	   #           conv.fraction_neighbors_cleaved(cleaved_seq.keys(), uncleaved_seq.keys(), middle_seq.keys(), middle_seq.keys()).values(),
+           #          conv.fraction_neighbors_cleaved(cleaved_seq.keys(), uncleaved_seq.keys(), middle_seq.keys(), uncleaved_seq.keys()).values()]
 	    normed = True
 	else:
             data = [ get_data_from_dict(cleaved_seq, key), get_data_from_dict(middle_seq, key), get_data_from_dict(uncleaved_seq, key) ]
-	    normed = True
+	    normed = True 
+	print key
         hist.draw_actual_plot(axarr[0,ind], data, "", key.capitalize(), log=log, normed=normed, label=["Cleaved", "Middle", "Uncleaved"], nbins=nbins)    
         axarr[0,ind].ticklabel_format(axis='x', style='sci', scilimits=(-2,2))
 
         #pconv.add_legend(axarr[0,ind], location="middle right")
-    pconv.save_fig(fig, output_prefix, "metrics", n_to_plot*5, 5, tight=True, size=12) 
+    pconv.save_fig(fig, output_prefix, metric, n_to_plot*2.5, 2.5, tight=True, size=9) 
 
     
 
@@ -66,6 +72,8 @@ if __name__ == "__main__":
 
     parser.add_argument ('--metric', default="metrics", help='name of metric to plot.  To plot all metrics, input metrics')
 
+    parser.add_argument ('--create_keys', action='store_true', default=False, help='When reading in lists, generate keys.  Necessary if multiple nodes with same sequence present.')
+
     args = parser.parse_args()
 
-    main(args.list_nodes, args.output_prefix, args.metric)
+    main(args.list_nodes, args.output_prefix, args.metric, args.create_keys)

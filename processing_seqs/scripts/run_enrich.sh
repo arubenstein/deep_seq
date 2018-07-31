@@ -34,9 +34,9 @@ do
      enrich_new_config=$enrich_dir'/input/test'   
 
      #check that hasn't been run already
-     ratios=( $enrich_dir'/'data/output/ratios* )
+     ratios=( $enrich_dir'/'data/output/*ratios* )
 
-     if [[ ${#ratios[@]} -eq 6 ]]
+     if [[ ${#ratios[@]} -eq 9 ]]
      then
          echo $bg'_'$sel_name" has already been run"
          continue
@@ -64,6 +64,7 @@ do
      sed -i 's:PATH_REP:'$outpath'/'$bg'_'$sel_name'/:g' $enrich_new_config
      sed -i 's:COUNTS_THRESHOLD:'$threshold':g' $enrich_new_config
      sed -i 's/dummy_run_name/'$bg'_'$sel_name'/g' $enrich_new_config
+     sed -i 's/COUNTS_NORM/'$COUNTS_NORM'/g' $enrich_new_config
 
      enrich --mode read_fuse --config_file $enrich_new_config
      enrich --mode read_align --config_file $enrich_new_config

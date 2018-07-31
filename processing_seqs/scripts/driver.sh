@@ -35,6 +35,9 @@ fi
 
 if [[ $enrich -eq 1 ]]
 then
+    max_seq=$(wc -l "$OUTPATH"/pre_enrich/*_cut.fastq | awk '{print $1}' | head -n -1 | sort -n | tail -n 1)
+    export COUNTS_NORM=$(( max_seq / 4 ))
+    print $COUNTS_NORM
     if [[ $threshold == "all" ]]
     then
         for i in `seq 1 30`

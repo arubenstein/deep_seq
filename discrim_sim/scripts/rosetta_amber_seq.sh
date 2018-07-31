@@ -5,10 +5,11 @@ db=$2
 inpath=$3
 temppath=$4
 outpath=$5
-sequence=$6
-home=$7
-scripts=$8
-queue_type=$9
+prefix=$6
+sequence=$7
+home=$8
+scripts=$9
+queue_type=${10}
 
 #declare functions
 check_file ()
@@ -27,29 +28,29 @@ check_file ()
 
 #preliminary commands
 
-mkdir -p $temppath'/'$sequence
+mkdir -p $temppath'/'$prefix
 
 #copy scorefunction files from db to temppath
-cp $db'/scoring/weights/talaris2014.wts' $temppath'/'$sequence
-cp $db'/scoring/weights/talaris2014_cst.wts' $temppath'/'$sequence
+cp $db'/scoring/weights/talaris2014.wts' $temppath'/'$prefix
+cp $db'/scoring/weights/talaris2014_cst.wts' $temppath'/'$prefix
 
 #in case restarting from previous job, copy any old files back
-rsync -av $outpath'/'$sequence'/'* $temppath'/'$sequence
+rsync -av --exclude="*.log" --exclude="*.out" --delete-after $outpath'/'$prefix'/' $temppath'/'$prefix
 
-cd $temppath'/'$sequence
+cd $temppath'/'$prefix
 
 #Rosetta part
 
 if [[ $queue_type == "torque" ]]
 then
 	#first kick off command to copy all files at 23:30 hours past this time. this will run in the background.
-	$scripts'/'rsync_files.sh $temppath'/'$sequence'/' $outpath'/'$sequence'/' &
+	$scripts'/'rsync_files.sh $temppath'/'$prefix'/' $outpath'/'$prefix'/' &
 fi
 
 #run command should place output files (pdb, txt, and silent file) in the temppath folder
 $bin/discrim_sim.static.linuxgccrelease -database $db -s $inpath/pdbs/ly104_CASHL.pdb -out::path::pdb $temppath -enzdes::cstfile $inpath/pdbs/ly104cstfile.txt -run:preserve_header "@"$home"/"git_repos/general_src/enzflags -out::prefix $sequence -resfile $inpath/resfile/rfpackpept.txt
 
-rsync -av $temppath'/'$sequence'/'* $outpath'/'$sequence'/'
+rsync -av --exclude="*.log" --exclude="*.out"  $temppath'/'$prefix'/'* $outpath'/'$prefix'/'
 
 #loop through pdb files and run amber on them
 for pdb_name in $(ls *.pdb)
@@ -62,7 +63,7 @@ do
 	#if file has not been created then run amber
 	if [[ $? -eq 1 ]]
 	then
-		$scripts'/amber_run_file.sh' $pn $temppath'/'$sequence $scripts $queue_type
+		$scripts'/amber_run_file.sh' $pn $temppath'/'$prefix $scripts $queue_type
 	else
 		echo "Amber run already completed for $pdb_name"
 	fi
@@ -79,9 +80,9 @@ do
 done
 
 #move all data back
-rsync -av $temppath'/'$sequence'/'* $outpath'/'$sequence'/'
+rsync -av --exclude="*.log" --exclude="*.out"  $temppath'/'$prefix '/'* $outpath'/'$prefix'/'
 
-for pdb_name in $(ls $outpath'/'$sequence'/'*.pdb)
+for pdb_name in $(ls $outpath'/'$prefix'/'*.pdb)
 do
         pn=$(basename $pdb_name '.pdb')
 
@@ -91,7 +92,7 @@ do
         if [[ $? -eq 0 ]]; then
                 rm -f $pdb_name
                 #in case restarting from previous job 
-                rm -f $outpath'/'$sequence'/'$pn'.pdb'
+                rm -f $outpath'/'$prefix'/'$pn'.pdb'
         else
                 echo "Warning - amber run did not complete and pdb file $pdb_name has not yet been deleted"
         fi
